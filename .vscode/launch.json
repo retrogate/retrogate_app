@@ -1,0 +1,36 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    
+    {
+      "name": "Launch RetroGate.CLI",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-cli",
+      "program": "${workspaceFolder}/RetroGate.CLI/bin/Debug/net8.0/RetroGate.CLI.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/RetroGate.CLI",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": "Launch RetroGate.Grpc",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-grpc",
+      "program": "${workspaceFolder}/RetroGate.Grpc/bin/Debug/net8.0/RetroGate.Grpc.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/RetroGate.Grpc",
+      "stopAtEntry": false,
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "http://localhost:5000;https://localhost:5001"
+      }
+    },
+    {
+      "name": "Attach to Process",
+      "type": "coreclr",
+      "request": "attach"
+    }
+  ]
+}

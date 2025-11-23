@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package config.proto.v1;
+
+import "google/protobuf/empty.proto";
+import "config/proto/v1/config_model.proto";
+
+option csharp_namespace = "RetroGate.Protos.Config.Proto.V1";
+
+service ConfigService {
+    rpc GetConfig(google.protobuf.Empty) returns (ConfigModel);
+    rpc SetConfig(ConfigModel) returns (google.protobuf.Empty);
+}

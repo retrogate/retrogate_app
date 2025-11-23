@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package game.proto.v1;
+
+option csharp_namespace = "RetroGate.Protos.Game.Proto.V1";
+
+message GameImagesModel {
+    string hero_url = 1;
+    string poster_url = 2;
+    string logo_url = 3;
+}

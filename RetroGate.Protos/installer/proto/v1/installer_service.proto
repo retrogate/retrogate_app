@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package installer.proto.v1;
+
+import "google/protobuf/empty.proto";
+import "installer/proto/v1/installer_model.proto";
+
+option csharp_namespace = "RetroGate.Protos.Installer.Proto.V1";
+
+service InstallerService {
+    rpc Install(InstallRequest) returns (InstallResponse);
+    rpc Delete(DeleteRequest) returns (google.protobuf.Empty);
+    rpc Cancel(CancelRequest) returns (google.protobuf.Empty);
+    rpc SubscribeProgress(SubscribeProgressRequest) returns (stream ProgressModel);
+}
+
+message InstallRequest {
+    string game_id = 1;
+    bool replace = 2;       // If true, reinstalls even if already installed
+    bool restart_steam = 3; // If true, restarts Steam after adding shortcut
+}
+
+message InstallResponse {
+    string install_path = 1;
+}
+
+message DeleteRequest {
+    repeated string paths = 1;
+}
+
+message CancelRequest {
+    string id = 1;
+}
+
+message SubscribeProgressRequest {
+    string game_id = 1;
+}

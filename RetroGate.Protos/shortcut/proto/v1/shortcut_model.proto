@@ -1,0 +1,28 @@
+﻿syntax = "proto3";
+
+package shortcut.proto.v1;
+
+option csharp_namespace = "RetroGate.Protos.Shortcut.Proto.V1";
+
+message ShortcutModel {
+    uint32 app_id = 1;
+    string app_name = 2;
+    string exe = 3;
+    string start_dir = 4;
+    string icon = 5;
+    string shortcut_path = 6;
+    string launch_options = 7;
+    bool is_hidden = 8;
+    bool allow_desktop_config = 9;
+    bool allow_overlay = 10;
+    bool open_vr = 11;
+    bool devkit = 12;
+    string devkit_game_id = 13;
+    uint32 devkit_override_app_id = 14;
+    uint32 last_play_time = 15;
+    string flatpak_app_id = 16;
+    string sort_as = 17;
+    string image_hero_url = 18;
+    string image_poster_url = 19;
+    string image_logo_url = 20;
+}

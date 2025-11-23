@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package shortcut.proto.v1;
+
+import "shortcut/proto/v1/shortcut_model.proto";
+import "google/protobuf/empty.proto";
+
+option csharp_namespace = "RetroGate.Protos.Shortcut.Proto.V1";
+
+service ShortcutService {
+    rpc GetAll (google.protobuf.Empty) returns (GetAllShortcutsResponse);
+    rpc Create (CreateRequest) returns (CreateResponse);
+}
+
+message GetAllShortcutsResponse {
+    repeated ShortcutModel shortcuts = 1;
+}
+
+message CreateRequest {
+    ShortcutModel shortcut = 1;
+}
+
+message CreateResponse {
+    ShortcutModel shortcut = 1;
+}
