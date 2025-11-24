@@ -1,20 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import '../../../core/widgets/gamepad_focusable.dart';
+import '../../../core/widgets/gamepad_navigation_scope.dart';
 import '../domain/models/game.dart';
 import 'bloc/games_bloc.dart';
 import 'bloc/games_event.dart';
 import 'bloc/games_state.dart';
 import 'widgets/gamepad_navigation_wrapper.dart';
 
-class GamesListPage extends StatelessWidget {
+class GamesListPage extends StatefulWidget {
   const GamesListPage({super.key});
+
+  @override
+  State<GamesListPage> createState() => _GamesListPageState();
+}
+
+class _GamesListPageState extends State<GamesListPage> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  bool _hasRegisteredActions = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    
+    // Register menu button action to open drawer only once
+    if (!_hasRegisteredActions) {
+      GamepadNavigationScope.registerMenuAction(context, () {
+        _scaffoldKey.currentState?.openDrawer();
+      });
+      _hasRegisteredActions = true;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => Modular.get<GamesBloc>()..add(const LoadGamesEvent()),
       child: Scaffold(
+        key: _scaffoldKey,
         backgroundColor: const Color(0xFF1B2838),
         appBar: AppBar(
           title: const Text(
@@ -27,7 +51,9 @@ class GamesListPage extends StatelessWidget {
           ),
           backgroundColor: const Color(0xFF171A21),
           elevation: 0,
+          iconTheme: const IconThemeData(color: Colors.white),
         ),
+        drawer: const _NavigationDrawer(),
         body: const _GamesListBody(),
         floatingActionButton: const _RefreshButton(),
       ),
@@ -414,6 +440,98 @@ class _GameCardState extends State<_GameCard> {
       ),
       maxLines: 2,
       overflow: TextOverflow.ellipsis,
+    );
+  }
+}
+
+class _NavigationDrawer extends StatelessWidget {
+  const _NavigationDrawer();
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      backgroundColor: const Color(0xFF171A21),
+      child: Column(
+        children: [
+          DrawerHeader(
+            decoration: const BoxDecoration(
+              color: Color(0xFF1B2838),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.gamepad,
+                  size: 64,
+                  color: const Color(0xFF66C0F4),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'RETROGATE',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 2,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          GamepadFocusable(
+            autofocus: true,
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: ListTile(
+              leading: const Icon(
+                Icons.videogame_asset,
+                color: Color(0xFF66C0F4),
+              ),
+              title: const Text(
+                'Games Library',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+              selected: true,
+              selectedTileColor: const Color(0xFF1B2838),
+            ),
+          ),
+          GamepadFocusable(
+            onPressed: () {
+              Navigator.pop(context);
+              Modular.to.navigate('/config/');
+            },
+            child: ListTile(
+              leading: const Icon(
+                Icons.settings,
+                color: Color(0xFF8F98A0),
+              ),
+              title: const Text(
+                'Settings',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ),
+          const Spacer(),
+          const Divider(color: Color(0xFF2A475E)),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              'Version 1.0.0',
+              style: TextStyle(
+                color: const Color(0xFF8F98A0),
+                fontSize: 12,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
