@@ -14,6 +14,7 @@ namespace RetroGate.SDK.Installer.Infra.Repository
 {
     public class InstallerRepository : IInstallerRepository
     {
+        public InstallerEventModel LastEvent {get; private set; } = new InstallerEventModel();
         private readonly IGetGameById _getGameById;
         private readonly ICreateShortcut _createShortcut;
         private readonly HttpClient _httpClient;
@@ -21,7 +22,7 @@ namespace RetroGate.SDK.Installer.Infra.Repository
         private readonly ConcurrentDictionary<string, CancellationTokenSource> _activeTasks;
         private readonly ConfigModel _config;
 
-        public event EventHandler<ProgressModel>? OnInstallProgressChanged;
+        public event EventHandler<InstallerEventModel>? OnInstallerEvent;
 
         public InstallerRepository(
             IGetGameById getGameById,
@@ -67,10 +68,10 @@ namespace RetroGate.SDK.Installer.Infra.Repository
                     Console.WriteLine($"[Installer] Jogo já instalado: {installPath}");
                     Console.WriteLine($"[Installer] Use replace=true para reinstalar");
                     
-                    ReportProgress(gameId, ProgressStatus.AddingToLibrary, 100, 0);
+                    ReportProgress(gameId, InstallerProgressState.CreatingShortcut, 100, 0);
                     await AddShortcutToSteam(game, installPath, restartSteam);
 
-                    ReportProgress(gameId, ProgressStatus.Completed, 100, 0);
+                    ReportProgress(gameId, InstallerProgressState.Completed, 100, 0);
                     
                     return installPath;
                 }
@@ -89,7 +90,7 @@ namespace RetroGate.SDK.Installer.Infra.Repository
                 try
                 {
                     // Reporta progresso: Iniciando download
-                    ReportProgress(gameId, ProgressStatus.Downloading, 0, 0);
+                    ReportProgress(gameId, InstallerProgressState.Downloading, 0, 0);
 
                     // Baixa o arquivo
                     var downloadPath = await DownloadGame(game, cts.Token);
@@ -99,7 +100,7 @@ namespace RetroGate.SDK.Installer.Infra.Repository
                     Console.WriteLine($"[Installer] Instalação concluída: {finalInstallPath}");
 
                     // Reporta progresso: Adicionando à biblioteca
-                    ReportProgress(gameId, ProgressStatus.AddingToLibrary, 90, 0);
+                    ReportProgress(gameId, InstallerProgressState.CreatingShortcut, 90, 0);
 
                     // Adiciona shortcut no Steam
                     await AddShortcutToSteam(game, finalInstallPath, restartSteam);
@@ -113,7 +114,7 @@ namespace RetroGate.SDK.Installer.Infra.Repository
                     }
 
                     // Reporta progresso: Completo
-                    ReportProgress(gameId, ProgressStatus.Completed, 100, 0);
+                    ReportProgress(gameId, InstallerProgressState.Completed, 100, 0);
                     Console.WriteLine($"[Installer] Instalação concluída com sucesso!");
 
                     return finalInstallPath;
@@ -126,13 +127,13 @@ namespace RetroGate.SDK.Installer.Infra.Repository
             catch (OperationCanceledException)
             {
                 Console.WriteLine($"[Installer] Instalação cancelada: {gameId}");
-                ReportProgress(gameId, ProgressStatus.Failed, 0, 0);
+                ReportProgress(gameId, InstallerProgressState.Failed, 0, 0);
                 return new ErrorBase { Message = "Instalação cancelada" };
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"[Installer] Erro durante instalação: {ex.Message}");
-                ReportProgress(gameId, ProgressStatus.Failed, 0, 0);
+                ReportProgress(gameId, InstallerProgressState.Failed, 0, 0);
                 return new ErrorBase { Message = $"Erro durante instalação: {ex.Message}" };
             }
         }
@@ -249,7 +250,7 @@ namespace RetroGate.SDK.Installer.Infra.Repository
                         ? (int)(bytesInInterval / 1024 / timeInSeconds)
                         : 0;
 
-                    ReportProgress(game.Id, ProgressStatus.Downloading, percentage, speedKbps);
+                    ReportProgress(game.Id, InstallerProgressState.Downloading, percentage, speedKbps);
 
                     lastReportTime = now;
                     lastDownloadedBytes = downloadedBytes;
@@ -257,7 +258,7 @@ namespace RetroGate.SDK.Installer.Infra.Repository
             }
 
             // Reporta 100% do download
-            ReportProgress(game.Id, ProgressStatus.Downloading, 100, 0);
+            ReportProgress(game.Id, InstallerProgressState.Downloading, 100, 0);
 
             return downloadPath;
         }
@@ -317,7 +318,7 @@ namespace RetroGate.SDK.Installer.Infra.Repository
                     {
                         extractedEntries++;
                         var percentage = extractedEntries * 100 / totalEntries;
-                        ReportProgress(game.Id, ProgressStatus.Extracting, percentage, 0);
+                        ReportProgress(game.Id, InstallerProgressState.Extracting, percentage, 0);
                         lastReportTime = now;
                     }
                 }
@@ -413,22 +414,26 @@ namespace RetroGate.SDK.Installer.Infra.Repository
 
         private void ReportProgress(
             string gameId,
-            ProgressStatus status,
+            InstallerProgressState state,
             int percentage,
             int speedKbps)
         {
-            var progress = new ProgressModel
-            {
-                Id = gameId,
-                Status = status,
-                Percentage = percentage,
-                SpeedInKbPerSec = speedKbps
-            };
-
             Console.WriteLine(
-                $"[Progress] {gameId} | Status: {status} | {percentage}% | {speedKbps} KB/s");
+                $"[Progress] {gameId} | State: {state} | {percentage}% | {speedKbps} KB/s");
 
-            OnInstallProgressChanged?.Invoke(this, progress);
+            var eventModel = new InstallerEventModel
+            {
+                EventType = InstallerEventType.ProgressChanged,
+                ProgressChanged = new InstallerEventProgressChangedModel
+                {
+                    GameId = gameId,
+                    State = state,
+                    Percentage = percentage,
+                    SpeedInKbPerSec = speedKbps
+                }
+            };
+            LastEvent = eventModel;
+            OnInstallerEvent?.Invoke(this, eventModel);
         }
 
         private void RestartSteam()

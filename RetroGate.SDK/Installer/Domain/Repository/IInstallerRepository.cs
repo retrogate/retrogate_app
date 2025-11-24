@@ -5,7 +5,9 @@ namespace RetroGate.SDK.Installer.Domain.Repository
 {
     public interface IInstallerRepository
     {
-        public event EventHandler<ProgressModel> OnInstallProgressChanged;
+        event EventHandler<InstallerEventModel> OnInstallerEvent;
+
+        InstallerEventModel LastEvent { get; }
 
         Task<Either<ErrorBase, string>> Install(string gameId, bool replace = false, bool restartSteam = false);
 
