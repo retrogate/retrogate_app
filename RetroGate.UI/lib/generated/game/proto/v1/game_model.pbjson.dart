@@ -38,6 +38,10 @@ const GameModel$json = {
     {'1': 'image_poster_url', '3': 6, '4': 1, '5': 9, '10': 'imagePosterUrl'},
     {'1': 'image_logo_url', '3': 7, '4': 1, '5': 9, '10': 'imageLogoUrl'},
     {'1': 'installation_method', '3': 8, '4': 1, '5': 14, '6': '.game.proto.v1.GameInstallationMethod', '10': 'installationMethod'},
+    {'1': 'settings_file', '3': 9, '4': 1, '5': 9, '9': 0, '10': 'settingsFile', '17': true},
+  ],
+  '8': [
+    {'1': '_settings_file'},
   ],
 };
 
@@ -48,5 +52,7 @@ final $typed_data.Uint8List gameModelDescriptor = $convert.base64Decode(
     'ZWN1dGFibGVQYXRoEiQKDmltYWdlX2hlcm9fdXJsGAUgASgJUgxpbWFnZUhlcm9VcmwSKAoQaW'
     '1hZ2VfcG9zdGVyX3VybBgGIAEoCVIOaW1hZ2VQb3N0ZXJVcmwSJAoOaW1hZ2VfbG9nb191cmwY'
     'ByABKAlSDGltYWdlTG9nb1VybBJWChNpbnN0YWxsYXRpb25fbWV0aG9kGAggASgOMiUuZ2FtZS'
-    '5wcm90by52MS5HYW1lSW5zdGFsbGF0aW9uTWV0aG9kUhJpbnN0YWxsYXRpb25NZXRob2Q=');
+    '5wcm90by52MS5HYW1lSW5zdGFsbGF0aW9uTWV0aG9kUhJpbnN0YWxsYXRpb25NZXRob2QSKAoN'
+    'c2V0dGluZ3NfZmlsZRgJIAEoCUgAUgxzZXR0aW5nc0ZpbGWIAQFCEAoOX3NldHRpbmdzX2ZpbG'
+    'U=');
 

@@ -27,6 +27,7 @@ class GameModel extends $pb.GeneratedMessage {
     $core.String? imagePosterUrl,
     $core.String? imageLogoUrl,
     GameInstallationMethod? installationMethod,
+    $core.String? settingsFile,
   }) {
     final $result = create();
     if (id != null) {
@@ -53,6 +54,9 @@ class GameModel extends $pb.GeneratedMessage {
     if (installationMethod != null) {
       $result.installationMethod = installationMethod;
     }
+    if (settingsFile != null) {
+      $result.settingsFile = settingsFile;
+    }
     return $result;
   }
   GameModel._() : super();
@@ -68,6 +72,7 @@ class GameModel extends $pb.GeneratedMessage {
     ..aOS(6, _omitFieldNames ? '' : 'imagePosterUrl')
     ..aOS(7, _omitFieldNames ? '' : 'imageLogoUrl')
     ..e<GameInstallationMethod>(8, _omitFieldNames ? '' : 'installationMethod', $pb.PbFieldType.OE, defaultOrMaker: GameInstallationMethod.GAME_INSTALLATION_METHOD_EXTRACT, valueOf: GameInstallationMethod.valueOf, enumValues: GameInstallationMethod.values)
+    ..aOS(9, _omitFieldNames ? '' : 'settingsFile')
     ..hasRequiredFields = false
   ;
 
@@ -163,6 +168,15 @@ class GameModel extends $pb.GeneratedMessage {
   $core.bool hasInstallationMethod() => $_has(7);
   @$pb.TagNumber(8)
   void clearInstallationMethod() => clearField(8);
+
+  @$pb.TagNumber(9)
+  $core.String get settingsFile => $_getSZ(8);
+  @$pb.TagNumber(9)
+  set settingsFile($core.String v) { $_setString(8, v); }
+  @$pb.TagNumber(9)
+  $core.bool hasSettingsFile() => $_has(8);
+  @$pb.TagNumber(9)
+  void clearSettingsFile() => clearField(9);
 }
 
 
