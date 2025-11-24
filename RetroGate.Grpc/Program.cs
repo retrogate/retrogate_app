@@ -1,4 +1,5 @@
-using System.Runtime.CompilerServices;
+using System.Collections.Concurrent;
+using RetroGate.Grpc.Common;
 using RetroGate.Grpc.Services;
 using RetroGate.SDK.Core.Domain.Repository;
 using RetroGate.SDK.Core.Domain.Usecases;
@@ -8,6 +9,7 @@ using RetroGate.SDK.Game.Domain.Repository;
 using RetroGate.SDK.Game.Domain.Usecases;
 using RetroGate.SDK.Game.Infra.Repository;
 using RetroGate.SDK.Game.Infra.Usecases;
+using RetroGate.SDK.Installer.Domain.Models;
 using RetroGate.SDK.Installer.Domain.Repository;
 using RetroGate.SDK.Installer.Domain.Usecases;
 using RetroGate.SDK.Installer.Infra.Repository;
@@ -29,6 +31,9 @@ var config = configRepository.GetConfig().Result.Match(
     Left: _ => new RetroGate.SDK.Core.Domain.Models.ConfigModel()
 );
 builder.Services.AddSingleton(config);
+
+var installerEventsSubscribers = new ConcurrentDictionary<string, Subscriber<InstallerEventModel>>();
+builder.Services.AddSingleton(installerEventsSubscribers);
 
 // Config service instances
 builder.Services.AddSingleton<IConfigRepository, ConfigRepository>();
