@@ -11,6 +11,7 @@ class Game {
   final String imagePosterUrl;
   final String imageLogoUrl;
   final GameInstallationMethod installationMethod;
+  final String? settingsFile;
 
   Game({
     required this.id,
@@ -21,6 +22,7 @@ class Game {
     required this.imagePosterUrl,
     required this.imageLogoUrl,
     required this.installationMethod,
+    this.settingsFile,
   });
 
   factory Game.fromProto(dynamic proto) {
@@ -33,6 +35,7 @@ class Game {
       imagePosterUrl: proto.imagePosterUrl,
       imageLogoUrl: proto.imageLogoUrl,
       installationMethod: GameInstallationMethod.values[proto.installationMethod.value],
+      settingsFile: proto.hasSettingsFile() ? proto.settingsFile : null,
     );
   }
 }
