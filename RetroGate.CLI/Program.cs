@@ -18,7 +18,7 @@ var config = configResult.Match(
 var modules = new List<ICLIModule>
 {
     new Shortcuts(config),
-    new Installer()
+    new Installer(config)
 };
 
 // Tenta processar com cada módulo

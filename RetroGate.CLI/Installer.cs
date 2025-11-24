@@ -10,7 +10,7 @@ using RetroGate.SDK.Shortcut.Infra.Usecases;
 
 namespace RetroGate.CLI
 {
-    public class Installer : ICLIModule
+    public class Installer(ConfigModel config) : ICLIModule
     {
         public bool CanHandle(string[] args)
         {
@@ -73,32 +73,31 @@ namespace RetroGate.CLI
             try
             {
                 // Inicializa os repositórios e use cases
-                var gameRepository = new GameRepository();
+                var imagesRepository = new GameImagesRepository(config);
+                var getImages = new GetGameImages(imagesRepository);
+                var gameRepository = new GameRepository(getImages);
                 var getGameByIdUseCase = new GetGameById(gameRepository);
 
                 var configRepository = new ConfigRepository();
-                var config = configRepository.GetConfig().Result.Match(
-                    Right: cfg => cfg,
-                    Left: _ => new RetroGate.SDK.Core.Domain.Models.ConfigModel()
-                );
                 var shortcutRepository = new ShortcutRepository(config);
                 var createShortcutUseCase = new CreateShortcut(shortcutRepository);
 
                 var installerRepository = new InstallerRepository(
                     getGameByIdUseCase,
-                    createShortcutUseCase);
+                    createShortcutUseCase,
+                    config);
 
                 // Inicializa o use case
                 var installGameUseCase = new InstallGame(installerRepository);
 
                 // Registra o evento de progresso
-                installerRepository.OnInstallProgressChanged += OnProgressChanged;
+                installerRepository.OnInstallerEvent += OnInstallerEvent;
 
                 // Inicia a instalação usando o use case
                 var result = await installGameUseCase.Call(gameId, replace);
 
                 // Remove o handler do evento
-                installerRepository.OnInstallProgressChanged -= OnProgressChanged;
+                installerRepository.OnInstallerEvent -= OnInstallerEvent;
 
                 // Verifica o resultado
                 if (result.IsRight)
@@ -148,20 +147,18 @@ namespace RetroGate.CLI
             try
             {
                 // Inicializa os repositórios e use cases
-                var gameRepository = new GameRepository();
+                var imagesRepository = new GameImagesRepository(config);
+                var getImages = new GetGameImages(imagesRepository);
+                var gameRepository = new GameRepository(getImages);
                 var getGameByIdUseCase = new GetGameById(gameRepository);
 
-                var configRepository = new ConfigRepository();
-                var config = configRepository.GetConfig().Result.Match(
-                    Right: cfg => cfg,
-                    Left: _ => new SDK.Core.Domain.Models.ConfigModel()
-                );
                 var shortcutRepository = new ShortcutRepository(config);
                 var createShortcutUseCase = new CreateShortcut(shortcutRepository);
 
                 var installerRepository = new InstallerRepository(
                     getGameByIdUseCase,
-                    createShortcutUseCase);
+                    createShortcutUseCase,
+                    config);
 
                 // Inicializa o use case
                 var deleteGameUseCase = new SDK.Installer.Infra.Usecases.DeleteGame(installerRepository);
@@ -189,37 +186,41 @@ namespace RetroGate.CLI
             }
         }
 
-        private void OnProgressChanged(object? sender, ProgressModel progress)
+        private void OnInstallerEvent(object? sender, InstallerEventModel e)
         {
-            var statusText = progress.Status switch
+            if (e.EventType == InstallerEventType.ProgressChanged)
             {
-                ProgressStatus.Downloading => "Baixando",
-                ProgressStatus.Extracting => "Extraindo",
-                ProgressStatus.AddingToLibrary => "Adicionando ao Steam",
-                ProgressStatus.Completed => "Concluído",
-                ProgressStatus.Failed => "Falhou",
-                ProgressStatus.Paused => "Pausado",
-                _ => "Aguardando"
-            };
+                var progress = e.ProgressChanged!;
+                var statusText = progress.State switch
+                {
+                    InstallerProgressState.Downloading => "Baixando",
+                    InstallerProgressState.Extracting => "Extraindo",
+                    InstallerProgressState.CreatingShortcut => "Adicionando ao Steam",
+                    InstallerProgressState.Completed => "Concluído",
+                    InstallerProgressState.Failed => "Falhou",
+                    InstallerProgressState.Paused => "Pausado",
+                    _ => "Aguardando"
+                };
 
-            var speedText = progress.SpeedInKbPerSec > 0
-                ? $" | {progress.SpeedInKbPerSec} KB/s"
-                : "";
+                var speedText = progress.SpeedInKbPerSec > 0
+                    ? $" | {progress.SpeedInKbPerSec} KB/s"
+                    : "";
 
-            // Cria a barra de progresso
-            var barWidth = 40;
-            var filledWidth = (int)(barWidth * progress.Percentage / 100.0);
-            var emptyWidth = barWidth - filledWidth;
-            var bar = new string('█', filledWidth) + new string('░', emptyWidth);
+                // Cria a barra de progresso
+                var barWidth = 40;
+                var filledWidth = (int)(barWidth * progress.Percentage / 100.0);
+                var emptyWidth = barWidth - filledWidth;
+                var bar = new string('█', filledWidth) + new string('░', emptyWidth);
 
-            // Limpa a linha atual e escreve o progresso
-            Console.Write($"\r[{bar}] {progress.Percentage}% | {statusText}{speedText}");
+                // Limpa a linha atual e escreve o progresso
+                Console.Write($"\r[{bar}] {progress.Percentage}% | {statusText}{speedText}");
 
-            // Se completou ou falhou, pula linha
-            if (progress.Status == ProgressStatus.Completed ||
-                progress.Status == ProgressStatus.Failed)
-            {
-                Console.WriteLine();
+                // Se completou ou falhou, pula linha
+                if (progress.State == InstallerProgressState.Completed ||
+                    progress.State == InstallerProgressState.Failed)
+                {
+                    Console.WriteLine();
+                }
             }
         }
 
