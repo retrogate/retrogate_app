@@ -3,7 +3,7 @@ syntax = "proto3";
 package installer.proto.v1;
 
 import "google/protobuf/empty.proto";
-import "installer/proto/v1/installer_model.proto";
+import "installer/proto/v1/installer_event_model.proto";
 
 option csharp_namespace = "RetroGate.Protos.Installer.Proto.V1";
 
@@ -11,7 +11,7 @@ service InstallerService {
     rpc Install(InstallRequest) returns (InstallResponse);
     rpc Delete(DeleteRequest) returns (google.protobuf.Empty);
     rpc Cancel(CancelRequest) returns (google.protobuf.Empty);
-    rpc SubscribeProgress(SubscribeProgressRequest) returns (stream ProgressModel);
+    rpc SubscribeEvents(google.protobuf.Empty) returns (stream InstallerEventModel);
 }
 
 message InstallRequest {

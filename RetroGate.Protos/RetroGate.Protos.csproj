@@ -12,7 +12,7 @@
     <Protobuf Include="game\proto\v1\game_service.proto" />
     <Protobuf Include="shortcut\proto\v1\shortcut_model.proto" />
     <Protobuf Include="shortcut\proto\v1\shortcut_service.proto" />
-    <Protobuf Include="installer\proto\v1\installer_model.proto" />
+    <Protobuf Include="installer\proto\v1\installer_event_model.proto" />
     <Protobuf Include="installer\proto\v1\installer_service.proto" />
     <Protobuf Include="config\proto\v1\config_model.proto" />
     <Protobuf Include="config\proto\v1\config_service.proto" />
