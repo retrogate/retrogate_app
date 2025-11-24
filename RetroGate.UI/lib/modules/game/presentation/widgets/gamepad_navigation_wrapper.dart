@@ -131,6 +131,11 @@ class _GamepadNavigationWrapperState extends State<GamepadNavigationWrapper> {
         Focus(
           autofocus: true,
           onKeyEvent: (node, event) {
+            // Ignore keyboard events if gamepad is connected (prevents double input)
+            if (_connectedGamepads.isNotEmpty) {
+              return KeyEventResult.ignored;
+            }
+            
             // Keyboard fallback for testing without gamepad
             if (event is KeyDownEvent) {
               switch (event.logicalKey) {
