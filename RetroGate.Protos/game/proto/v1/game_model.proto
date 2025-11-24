@@ -17,4 +17,5 @@ message GameModel {
     string image_poster_url = 6;
     string image_logo_url = 7;
     GameInstallationMethod installation_method = 8;
+    optional string settings_file = 9;
 }
