@@ -109,7 +109,9 @@ class _GamepadNavigationScopeState extends State<GamepadNavigationScope> {
       case '0':
       case 'button-0':
         // Trigger activation on currently focused widget
-        _activateFocusedWidget();
+        if(event.value == 1.0) {
+          _activateFocusedWidget();
+        }
         break;
     }
   }
