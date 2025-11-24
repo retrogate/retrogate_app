@@ -22,6 +22,7 @@ class _AddGamePageState extends State<AddGamePage> {
   final _nameController = TextEditingController();
   final _executablePathController = TextEditingController();
   final _downloadUrlController = TextEditingController();
+  final _settingsFileController = TextEditingController();
   
   bool _hasRegisteredActions = false;
   String? _heroImageUrl;
@@ -41,6 +42,7 @@ class _AddGamePageState extends State<AddGamePage> {
     _nameController.dispose();
     _executablePathController.dispose();
     _downloadUrlController.dispose();
+    _settingsFileController.dispose();
     super.dispose();
   }
 
@@ -73,6 +75,8 @@ class _AddGamePageState extends State<AddGamePage> {
 
   void _handleCreateGame() {
     if (_formKey.currentState!.validate()) {
+      final settingsFile = _settingsFileController.text.trim();
+      
       final game = Game(
         id: '', // Server will generate ID
         name: _nameController.text,
@@ -82,6 +86,7 @@ class _AddGamePageState extends State<AddGamePage> {
         imagePosterUrl: _posterImageUrl ?? '',
         imageLogoUrl: _logoImageUrl ?? '',
         installationMethod: GameInstallationMethod.extract,
+        settingsFile: settingsFile.isEmpty ? null : settingsFile,
       );
 
       _bloc.add(CreateGameEvent(game));
@@ -310,6 +315,26 @@ class _AddGamePageState extends State<AddGamePage> {
                       }
                       return null;
                     },
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Settings File Field (Optional)
+                  TextFormField(
+                    controller: _settingsFileController,
+                    enabled: !isLoading,
+                    style: const TextStyle(color: Colors.white),
+                    decoration: const InputDecoration(
+                      labelText: 'Settings File (Optional)',
+                      hintText: 'e.g., game.ini, config.cfg, settings.json',
+                      hintStyle: TextStyle(color: Colors.white38),
+                      labelStyle: TextStyle(color: Color(0xFF66C0F4)),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Color(0xFF66C0F4)),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Color(0xFF66C0F4), width: 2),
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 24),
 
