@@ -1,101 +1,101 @@
 # Protocol Buffers Code Generation
 
-Este projeto usa Protocol Buffers (proto3) para comunicação gRPC entre o cliente Flutter e o servidor C#.
+This project uses Protocol Buffers (proto3) for gRPC communication between the Flutter client and C# server.
 
-## Estrutura
+## Structure
 
-- **Definições**: `../RetroGate.Protos/` (fonte única de verdade)
-- **Código Gerado**: `lib/generated/` (gerado automaticamente)
-- **Dependências**: `protos/google/protobuf/` (arquivos comuns do protobuf)
+- **Definitions**: `../RetroGate.Protos/` (single source of truth)
+- **Generated Code**: `lib/generated/` (automatically generated)
+- **Dependencies**: `protos/google/protobuf/` (common protobuf files)
 
 ## Makefile
 
-O projeto inclui um Makefile para facilitar a geração de código Dart a partir dos arquivos `.proto`.
+The project includes a Makefile to facilitate Dart code generation from `.proto` files.
 
-### Comandos Disponíveis
+### Available Commands
 
 ```bash
-# Ver ajuda
+# Show help
 make help
 
-# Gerar todos os módulos
+# Generate all modules
 make gen
 
-# Gerar módulo específico
-make gen-game        # Módulo de jogos
-make gen-config      # Módulo de configuração
-make gen-installer   # Módulo de instalação
-make gen-shortcut    # Módulo de atalhos
+# Generate specific module
+make gen-game        # Game module
+make gen-config      # Configuration module
+make gen-installer   # Installer module
+make gen-shortcut    # Shortcut module
 
-# Limpar arquivos gerados
+# Clean generated files
 make clean
 ```
 
-### Uso Típico
+### Typical Usage
 
-Após modificar qualquer arquivo `.proto` em `RetroGate.Protos`:
+After modifying any `.proto` file in `RetroGate.Protos`:
 
 ```bash
 cd RetroGate.UI
 make gen
 ```
 
-Ou para regenerar apenas um módulo específico:
+Or to regenerate only a specific module:
 
 ```bash
 make gen-installer
 ```
 
-## Módulos
+## Modules
 
 ### Game
-- `game_model.proto` - Modelo de dados de jogos
-- `game_images_model.proto` - Modelo de imagens do jogo
-- `game_service.proto` - Serviço gRPC de jogos
+- `game_model.proto` - Game data model
+- `game_images_model.proto` - Game images model
+- `game_service.proto` - Game gRPC service
 
 ### Config
-- `config_model.proto` - Modelo de configuração
-- `config_service.proto` - Serviço gRPC de configuração
+- `config_model.proto` - Configuration model
+- `config_service.proto` - Configuration gRPC service
 
 ### Installer
-- `installer_event_model.proto` - Eventos de progresso de instalação
-- `installer_service.proto` - Serviço gRPC de instalação
+- `installer_event_model.proto` - Installation progress events
+- `installer_service.proto` - Installer gRPC service
 
 ### Shortcut
-- `shortcut_model.proto` - Modelo de atalhos
-- `shortcut_service.proto` - Serviço gRPC de atalhos
+- `shortcut_model.proto` - Shortcut model
+- `shortcut_service.proto` - Shortcut gRPC service
 
-## Requisitos
+## Requirements
 
 - `protoc` - Protocol Buffers compiler
-- `protoc-gen-dart` - Plugin Dart para protoc
+- `protoc-gen-dart` - Dart plugin for protoc
 
-### Instalação
+### Installation
 
 ```bash
-# Instalar plugin Dart para protoc
+# Install Dart plugin for protoc
 dart pub global activate protoc_plugin
 ```
 
 ## Troubleshooting
 
-### Erro: "protoc: command not found"
+### Error: "protoc: command not found"
 
-Instale o Protocol Buffers compiler:
+Install the Protocol Buffers compiler:
 - Windows: `choco install protoc`
 - macOS: `brew install protobuf`
 - Linux: `apt-get install protobuf-compiler`
 
-### Erro: "protoc-gen-dart: program not found"
+### Error: "protoc-gen-dart: program not found"
 
-Certifique-se de que o plugin Dart está instalado e no PATH:
+Make sure the Dart plugin is installed and in PATH:
 
 ```bash
 dart pub global activate protoc_plugin
-# Adicione ao PATH: %USERPROFILE%\AppData\Local\Pub\Cache\bin
+# Add to PATH: %USERPROFILE%\AppData\Local\Pub\Cache\bin
 ```
 
-## Estrutura de Código Gerado
+## Generated Code Structure
 
 ```
 lib/generated/
@@ -115,9 +115,9 @@ lib/generated/
         └── empty.pb.dart
 ```
 
-## Notas Importantes
+## Important Notes
 
-1. **Não edite arquivos gerados**: Todos os arquivos em `lib/generated/` são gerados automaticamente
-2. **Fonte única**: As definições `.proto` estão em `RetroGate.Protos`
-3. **Versioning**: Arquivos gerados não devem ser commitados (já estão no .gitignore)
-4. **Sincronização**: Execute `make gen` após cada pull que modifique os protos
+1. **Don't edit generated files**: All files in `lib/generated/` are automatically generated
+2. **Single source**: Proto definitions are in `RetroGate.Protos`
+3. **Versioning**: Generated files should not be committed (already in .gitignore)
+4. **Synchronization**: Run `make gen` after each pull that modifies the protos
