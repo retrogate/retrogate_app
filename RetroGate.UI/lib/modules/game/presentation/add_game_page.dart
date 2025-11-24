@@ -25,6 +25,7 @@ class _AddGamePageState extends State<AddGamePage> {
   final _settingsFileController = TextEditingController();
   
   bool _hasRegisteredActions = false;
+  bool _gameJustCreated = false;
   String? _heroImageUrl;
   String? _posterImageUrl;
   String? _logoImageUrl;
@@ -132,15 +133,20 @@ class _AddGamePageState extends State<AddGamePage> {
         bloc: _bloc,
         listener: (context, state) {
           if (state is GameCreatedState) {
+            // Mark that we just created a game
+            _gameJustCreated = true;
+            // Reload games list
+            _bloc.add(const LoadGamesEvent());
+          } else if (state is GamesLoadedState && _gameJustCreated) {
+            // Games reloaded after creation - now we can go back
+            _gameJustCreated = false;
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Game "${state.game.name}" created successfully!'),
-                backgroundColor: const Color(0xFF66C0F4),
+              const SnackBar(
+                content: Text('Game created successfully!'),
+                backgroundColor: Color(0xFF66C0F4),
+                duration: Duration(seconds: 2),
               ),
             );
-            
-            // Reload games list and go back
-            _bloc.add(const LoadGamesEvent());
             Navigator.of(context).pop();
           } else if (state is GameImagesLoadedState) {
             setState(() {
@@ -182,7 +188,7 @@ class _AddGamePageState extends State<AddGamePage> {
                   ),
                   const SizedBox(height: 8),
                   const Text(
-                    'Add a new game to your library',
+                    'Add a new game to the RetroGate catalog',
                     style: TextStyle(
                       color: Colors.white70,
                       fontSize: 14,

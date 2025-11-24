@@ -58,7 +58,7 @@ class AppDrawer extends StatelessWidget {
                 color: Color(0xFF66C0F4),
               ),
               title: const Text(
-                'Games Library',
+                'Browse Games',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 16,

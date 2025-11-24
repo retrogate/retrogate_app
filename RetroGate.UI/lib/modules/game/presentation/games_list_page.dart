@@ -174,7 +174,7 @@ class _GamesListBody extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  'Your library is empty',
+                  'No games available yet',
                   style: TextStyle(
                     color: Color(0xFF8F98A0),
                     fontSize: 14,
@@ -261,7 +261,7 @@ class _GamesListBody extends StatelessWidget {
               ),
               const SizedBox(width: 12),
               const Text(
-                'MY LIBRARY',
+                'AVAILABLE GAMES',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 24,
