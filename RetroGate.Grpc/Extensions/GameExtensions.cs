@@ -17,6 +17,12 @@ namespace RetroGate.Grpc.Extensions
                 ImagePosterUrl = domain.ImagePosterUrl ?? string.Empty,
                 ImageLogoUrl = domain.ImageLogoUrl ?? string.Empty,
             };
+            
+            if (domain.SettingsFile != null)
+            {
+                proto.SettingsFile = domain.SettingsFile;
+            }
+            
             return proto;
         }
 
@@ -31,6 +37,7 @@ namespace RetroGate.Grpc.Extensions
                 ImageHeroUrl = proto.ImageHeroUrl,
                 ImagePosterUrl = proto.ImagePosterUrl,
                 ImageLogoUrl = proto.ImageLogoUrl,
+                SettingsFile = proto.HasSettingsFile ? proto.SettingsFile : null,
             };
         }
 
