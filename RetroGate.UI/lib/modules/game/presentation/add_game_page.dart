@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import '../../../core/widgets/gamepad_navigation_scope.dart';
 import '../../../core/widgets/gamepad_focusable.dart';
+import '../../../core/widgets/app_drawer.dart';
 import '../domain/models/game.dart';
 import 'bloc/games_bloc.dart';
 import 'bloc/games_event.dart';
@@ -16,6 +17,7 @@ class AddGamePage extends StatefulWidget {
 }
 
 class _AddGamePageState extends State<AddGamePage> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _executablePathController = TextEditingController();
@@ -46,6 +48,19 @@ class _AddGamePageState extends State<AddGamePage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_hasRegisteredActions) {
+      // Menu button toggles drawer
+      GamepadNavigationScope.registerMenuAction(context, () {
+        final scaffoldState = _scaffoldKey.currentState;
+        if (scaffoldState != null) {
+          if (scaffoldState.isDrawerOpen) {
+            Navigator.of(context).pop(); // Close drawer
+          } else {
+            scaffoldState.openDrawer(); // Open drawer
+          }
+        }
+      });
+      
+      // Back button goes back
       GamepadNavigationScope.registerBackAction(
         context,
         () {
@@ -89,6 +104,7 @@ class _AddGamePageState extends State<AddGamePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: const Color(0xFF1B2838),
       appBar: AppBar(
         backgroundColor: const Color(0xFF171A21),
@@ -104,6 +120,7 @@ class _AddGamePageState extends State<AddGamePage> {
           color: Color(0xFF66C0F4),
         ),
       ),
+      drawer: const AppDrawer(currentRoute: '/games/add'),
       body: BlocConsumer<GamesBloc, GamesState>(
         bloc: _bloc,
         listener: (context, state) {

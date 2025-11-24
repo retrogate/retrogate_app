@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import '../../../core/widgets/gamepad_navigation_scope.dart';
+import '../../../core/widgets/app_drawer.dart';
 import 'bloc/config_bloc.dart';
 import 'bloc/config_event.dart';
 import 'bloc/config_state.dart';
@@ -15,6 +16,7 @@ class ConfigPage extends StatefulWidget {
 }
 
 class _ConfigPageState extends State<ConfigPage> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final _formKey = GlobalKey<FormState>();
   final _steamPathController = TextEditingController();
   final _steamUserIdController = TextEditingController();
@@ -32,11 +34,25 @@ class _ConfigPageState extends State<ConfigPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     
-    // Register back button action only once
+    // Register gamepad actions only once
     if (!_hasRegisteredActions) {
+      // Menu button toggles drawer
+      GamepadNavigationScope.registerMenuAction(context, () {
+        final scaffoldState = _scaffoldKey.currentState;
+        if (scaffoldState != null) {
+          if (scaffoldState.isDrawerOpen) {
+            Navigator.of(context).pop(); // Close drawer
+          } else {
+            scaffoldState.openDrawer(); // Open drawer
+          }
+        }
+      });
+      
+      // Back button goes to games
       GamepadNavigationScope.registerBackAction(context, () {
         Modular.to.navigate('/games/');
       });
+      
       _hasRegisteredActions = true;
     }
   }
@@ -64,13 +80,10 @@ class _ConfigPageState extends State<ConfigPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: const Color(0xFF1B2838),
       appBar: AppBar(
         backgroundColor: const Color(0xFF171A21),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Modular.to.navigate('/games/'),
-        ),
         title: const Text(
           'Settings',
           style: TextStyle(
@@ -79,7 +92,11 @@ class _ConfigPageState extends State<ConfigPage> {
             fontWeight: FontWeight.bold,
           ),
         ),
+        iconTheme: const IconThemeData(
+          color: Color(0xFF66C0F4),
+        ),
       ),
+      drawer: const AppDrawer(currentRoute: '/config/'),
       body: BlocConsumer<ConfigBloc, ConfigState>(
         listener: (context, state) {
           if (state is ConfigSaved) {
