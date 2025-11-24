@@ -8,6 +8,7 @@ class GamepadNavigationWrapper extends StatefulWidget {
   final int itemCount;
   final int crossAxisCount;
   final Function(int index) onItemSelected;
+  final bool enabled;
 
   const GamepadNavigationWrapper({
     super.key,
@@ -15,6 +16,7 @@ class GamepadNavigationWrapper extends StatefulWidget {
     required this.itemCount,
     required this.crossAxisCount,
     required this.onItemSelected,
+    this.enabled = true,
   });
 
   @override
@@ -55,6 +57,7 @@ class _GamepadNavigationWrapperState extends State<GamepadNavigationWrapper> {
   }
 
   void _handleButtonInput(GamepadEvent event) {
+    if (!widget.enabled) return; // Ignore input when disabled
     if (event.value < 0.5) return; // Button not pressed enough
     
     switch (event.key) {
@@ -69,6 +72,8 @@ class _GamepadNavigationWrapperState extends State<GamepadNavigationWrapper> {
   }
 
   void _handleAnalogInput(GamepadEvent event) {
+    if (!widget.enabled) return; // Ignore input when disabled
+    
     // POV (D-Pad) - Point of View hat switch
     // Values in degrees * 100: 0=up, 9000=right, 18000=down, 27000=left, 65535=neutral
     if (event.key == 'pov') {

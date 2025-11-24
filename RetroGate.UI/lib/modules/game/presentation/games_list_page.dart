@@ -19,6 +19,7 @@ class GamesListPage extends StatefulWidget {
 class _GamesListPageState extends State<GamesListPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   bool _hasRegisteredActions = false;
+  bool _isDrawerOpen = false;
 
   @override
   void didChangeDependencies() {
@@ -60,8 +61,13 @@ class _GamesListPageState extends State<GamesListPage> {
           elevation: 0,
           iconTheme: const IconThemeData(color: Colors.white),
         ),
+        onDrawerChanged: (isOpen) {
+          setState(() {
+            _isDrawerOpen = isOpen;
+          });
+        },
         drawer: const _NavigationDrawer(),
-        body: const _GamesListBody(),
+        body: _GamesListBody(isDrawerOpen: _isDrawerOpen),
         floatingActionButton: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -111,7 +117,9 @@ class _RefreshButton extends StatelessWidget {
 }
 
 class _GamesListBody extends StatelessWidget {
-  const _GamesListBody();
+  final bool isDrawerOpen;
+
+  const _GamesListBody({this.isDrawerOpen = false});
 
   @override
   Widget build(BuildContext context) {
@@ -241,6 +249,7 @@ class _GamesListBody extends StatelessWidget {
         return GamepadNavigationWrapper(
           itemCount: games.length,
           crossAxisCount: crossAxisCount,
+          enabled: !isDrawerOpen, // Disable when drawer is open
           onItemSelected: (index) {
             // TODO: Navigate to game details or launch game
             final game = games[index];
