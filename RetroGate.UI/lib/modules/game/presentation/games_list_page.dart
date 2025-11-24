@@ -49,19 +49,6 @@ class _GamesListPageState extends State<GamesListPage> {
       child: Scaffold(
         key: _scaffoldKey,
         backgroundColor: const Color(0xFF1B2838),
-        appBar: AppBar(
-          title: const Text(
-            'RETROGATE',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 2,
-            ),
-          ),
-          backgroundColor: const Color(0xFF171A21),
-          elevation: 0,
-          iconTheme: const IconThemeData(color: Colors.white),
-        ),
         onDrawerChanged: (isOpen) {
           setState(() {
             _isDrawerOpen = isOpen;
@@ -69,27 +56,58 @@ class _GamesListPageState extends State<GamesListPage> {
         },
         drawer: const AppDrawer(currentRoute: '/games/'),
         body: _GamesListBody(isDrawerOpen: _isDrawerOpen),
-        floatingActionButton: Column(
-          mainAxisSize: MainAxisSize.min,
+        floatingActionButton: Stack(
           children: [
-            GamepadFocusable(
-              onPressed: () {
-                Modular.to.pushNamed('/games/add');
-              },
+            // Menu button (bottom left)
+            Positioned(
+              left: 16,
+              bottom: 16,
               child: FloatingActionButton(
                 onPressed: () {
-                  Modular.to.pushNamed('/games/add');
+                  final scaffoldState = _scaffoldKey.currentState;
+                  if (scaffoldState != null) {
+                    if (scaffoldState.isDrawerOpen) {
+                      Navigator.of(context).pop();
+                    } else {
+                      scaffoldState.openDrawer();
+                    }
+                  }
                 },
                 backgroundColor: const Color(0xFF66C0F4),
-                heroTag: 'add_game',
-                tooltip: 'Add Game',
-                child: const Icon(Icons.add, color: Color(0xFF171A21)),
+                heroTag: 'menu_button',
+                tooltip: 'Menu',
+                child: const Icon(Icons.menu, color: Color(0xFF171A21)),
               ),
             ),
-            const SizedBox(height: 12),
-            const _RefreshButton(),
+            // Add and Refresh buttons (bottom right)
+            Positioned(
+              right: 16,
+              bottom: 16,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  GamepadFocusable(
+                    onPressed: () {
+                      Modular.to.pushNamed('/games/add');
+                    },
+                    child: FloatingActionButton(
+                      onPressed: () {
+                        Modular.to.pushNamed('/games/add');
+                      },
+                      backgroundColor: const Color(0xFF66C0F4),
+                      heroTag: 'add_game',
+                      tooltip: 'Add Game',
+                      child: const Icon(Icons.add, color: Color(0xFF171A21)),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  const _RefreshButton(),
+                ],
+              ),
+            ),
           ],
         ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       ),
     );
   }
@@ -228,6 +246,61 @@ class _GamesListBody extends StatelessWidget {
   }
 
   Widget _buildGamesList(List<Game> games) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Title Section
+        Padding(
+          padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+          child: Row(
+            children: [
+              const Icon(
+                Icons.videogame_asset,
+                color: Color(0xFF66C0F4),
+                size: 28,
+              ),
+              const SizedBox(width: 12),
+              const Text(
+                'MY LIBRARY',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.5,
+                ),
+              ),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF66C0F4).withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: const Color(0xFF66C0F4),
+                    width: 1,
+                  ),
+                ),
+                child: Text(
+                  '${games.length} ${games.length == 1 ? 'game' : 'games'}',
+                  style: const TextStyle(
+                    color: Color(0xFF66C0F4),
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        // Games Grid
+        Expanded(
+          child: _buildGamesGrid(games),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGamesGrid(List<Game> games) {
     return LayoutBuilder(
       builder: (context, constraints) {
         // Responsive grid: more columns on wider screens

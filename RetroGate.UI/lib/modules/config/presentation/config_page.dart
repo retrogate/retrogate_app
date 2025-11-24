@@ -82,21 +82,23 @@ class _ConfigPageState extends State<ConfigPage> {
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: const Color(0xFF1B2838),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF171A21),
-        title: const Text(
-          'Settings',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        iconTheme: const IconThemeData(
-          color: Color(0xFF66C0F4),
-        ),
-      ),
       drawer: const AppDrawer(currentRoute: '/config/'),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          final scaffoldState = _scaffoldKey.currentState;
+          if (scaffoldState != null) {
+            if (scaffoldState.isDrawerOpen) {
+              Navigator.of(context).pop();
+            } else {
+              scaffoldState.openDrawer();
+            }
+          }
+        },
+        backgroundColor: const Color(0xFF66C0F4),
+        tooltip: 'Menu',
+        child: const Icon(Icons.menu, color: Color(0xFF171A21)),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
       body: BlocConsumer<ConfigBloc, ConfigState>(
         listener: (context, state) {
           if (state is ConfigSaved) {
@@ -142,13 +144,25 @@ class _ConfigPageState extends State<ConfigPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'RetroGate Configuration',
-                    style: TextStyle(
-                      color: Color(0xFF66C0F4),
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  // Title Section
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.settings,
+                        color: Color(0xFF66C0F4),
+                        size: 28,
+                      ),
+                      const SizedBox(width: 12),
+                      const Text(
+                        'SETTINGS',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.5,
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 8),
                   const Text(

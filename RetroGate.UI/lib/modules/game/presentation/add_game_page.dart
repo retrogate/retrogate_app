@@ -106,21 +106,23 @@ class _AddGamePageState extends State<AddGamePage> {
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: const Color(0xFF1B2838),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF171A21),
-        title: const Text(
-          'Add Game',
-          style: TextStyle(
-            color: Color(0xFF66C0F4),
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        iconTheme: const IconThemeData(
-          color: Color(0xFF66C0F4),
-        ),
-      ),
       drawer: const AppDrawer(currentRoute: '/games/add'),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          final scaffoldState = _scaffoldKey.currentState;
+          if (scaffoldState != null) {
+            if (scaffoldState.isDrawerOpen) {
+              Navigator.of(context).pop();
+            } else {
+              scaffoldState.openDrawer();
+            }
+          }
+        },
+        backgroundColor: const Color(0xFF66C0F4),
+        tooltip: 'Menu',
+        child: const Icon(Icons.menu, color: Color(0xFF171A21)),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
       body: BlocConsumer<GamesBloc, GamesState>(
         bloc: _bloc,
         listener: (context, state) {
@@ -153,6 +155,36 @@ class _AddGamePageState extends State<AddGamePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  // Title Section
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.add_circle,
+                        color: Color(0xFF66C0F4),
+                        size: 28,
+                      ),
+                      const SizedBox(width: 12),
+                      const Text(
+                        'ADD GAME',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Add a new game to your library',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  
                   // Name Field
                   TextFormField(
                     controller: _nameController,
