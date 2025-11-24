@@ -15,5 +15,6 @@
         public string ImagePosterUrl { get; set; } = string.Empty;
         public string ImageLogoUrl { get; set; } = string.Empty;
         public GameInstallationMethod InstallationMethod { get; set; }
+        public string? SettingsFile { get; set; }
     }
 }
