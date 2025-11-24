@@ -24,10 +24,17 @@ class _GamesListPageState extends State<GamesListPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     
-    // Register menu button action to open drawer only once
+    // Register menu button action to toggle drawer
     if (!_hasRegisteredActions) {
       GamepadNavigationScope.registerMenuAction(context, () {
-        _scaffoldKey.currentState?.openDrawer();
+        final scaffoldState = _scaffoldKey.currentState;
+        if (scaffoldState != null) {
+          if (scaffoldState.isDrawerOpen) {
+            Navigator.of(context).pop(); // Close drawer
+          } else {
+            scaffoldState.openDrawer(); // Open drawer
+          }
+        }
       });
       _hasRegisteredActions = true;
     }
