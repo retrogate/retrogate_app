@@ -90,8 +90,8 @@ class _GamepadNavigationScopeState extends State<GamepadNavigationScope> {
       case 'button_select':
       case 'button_start':
       case 'button_mode':
-      case '6': // Start button
-      case 'button-6':
+      case '7': // Start button
+      case 'button-7':
         _onMenuButtonPressed?.call();
         break;
 
