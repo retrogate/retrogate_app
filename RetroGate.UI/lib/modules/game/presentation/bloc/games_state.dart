@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import '../../domain/models/game.dart';
+import '../../domain/models/game_images.dart';
 
 abstract class GamesState extends Equatable {
   const GamesState();
@@ -36,4 +37,30 @@ class GamesErrorState extends GamesState {
 
   @override
   List<Object?> get props => [message];
+}
+
+class GameCreatingState extends GamesState {
+  const GameCreatingState();
+}
+
+class GameCreatedState extends GamesState {
+  final Game game;
+
+  const GameCreatedState(this.game);
+
+  @override
+  List<Object?> get props => [game];
+}
+
+class GameImagesLoadingState extends GamesState {
+  const GameImagesLoadingState();
+}
+
+class GameImagesLoadedState extends GamesState {
+  final GameImages images;
+
+  const GameImagesLoadedState(this.images);
+
+  @override
+  List<Object?> get props => [images];
 }

@@ -55,7 +55,27 @@ class _GamesListPageState extends State<GamesListPage> {
         ),
         drawer: const _NavigationDrawer(),
         body: const _GamesListBody(),
-        floatingActionButton: const _RefreshButton(),
+        floatingActionButton: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            GamepadFocusable(
+              onPressed: () {
+                Modular.to.pushNamed('/games/add');
+              },
+              child: FloatingActionButton(
+                onPressed: () {
+                  Modular.to.pushNamed('/games/add');
+                },
+                backgroundColor: const Color(0xFF66C0F4),
+                heroTag: 'add_game',
+                tooltip: 'Add Game',
+                child: const Icon(Icons.add, color: Color(0xFF171A21)),
+              ),
+            ),
+            const SizedBox(height: 12),
+            const _RefreshButton(),
+          ],
+        ),
       ),
     );
   }
@@ -66,13 +86,19 @@ class _RefreshButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FloatingActionButton(
+    return GamepadFocusable(
       onPressed: () {
         BlocProvider.of<GamesBloc>(context).add(const RefreshGamesEvent());
       },
-      backgroundColor: const Color(0xFF66C0F4),
-      tooltip: 'Refresh',
-      child: const Icon(Icons.refresh, color: Colors.white),
+      child: FloatingActionButton(
+        onPressed: () {
+          BlocProvider.of<GamesBloc>(context).add(const RefreshGamesEvent());
+        },
+        backgroundColor: const Color(0xFF66C0F4),
+        heroTag: 'refresh_games',
+        tooltip: 'Refresh',
+        child: const Icon(Icons.refresh, color: Color(0xFF171A21)),
+      ),
     );
   }
 }
