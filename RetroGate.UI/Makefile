@@ -61,25 +61,25 @@ gen: gen-game gen-config gen-installer gen-shortcut
 # Generate game module
 gen-game:
 	@echo "Generating game module..."
-	$(PROTOC) $(PROTOC_GEN_DART) $(PROTO_PATH) $(GOOGLE_EMPTY) $(GAME_PROTOS)
+	$(PROTOC) $(PROTOC_GEN_DART) $(PROTO_PATH) $(GAME_PROTOS)
 	@echo "✓ Game module generated"
 
 # Generate config module
 gen-config:
 	@echo "Generating config module..."
-	$(PROTOC) $(PROTOC_GEN_DART) $(PROTO_PATH) $(GOOGLE_EMPTY) $(CONFIG_PROTOS)
+	$(PROTOC) $(PROTOC_GEN_DART) $(PROTO_PATH) $(CONFIG_PROTOS)
 	@echo "✓ Config module generated"
 
 # Generate installer module
 gen-installer:
 	@echo "Generating installer module..."
-	$(PROTOC) $(PROTOC_GEN_DART) $(PROTO_PATH) $(GOOGLE_EMPTY) $(INSTALLER_PROTOS)
+	$(PROTOC) $(PROTOC_GEN_DART) $(PROTO_PATH) $(INSTALLER_PROTOS)
 	@echo "✓ Installer module generated"
 
 # Generate shortcut module
 gen-shortcut:
 	@echo "Generating shortcut module..."
-	$(PROTOC) $(PROTOC_GEN_DART) $(PROTO_PATH) $(GOOGLE_EMPTY) $(SHORTCUT_PROTOS)
+	$(PROTOC) $(PROTOC_GEN_DART) $(PROTO_PATH) $(SHORTCUT_PROTOS)
 	@echo "✓ Shortcut module generated"
 
 # Clean generated files
