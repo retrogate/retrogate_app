@@ -2,7 +2,6 @@ import 'package:grpc/grpc.dart';
 import '../../../../generated/game/proto/v1/game_service.pbgrpc.dart';
 import '../../../../generated/game/proto/v1/game_model.pb.dart';
 import '../../../../generated/game/proto/v1/game_images_model.pb.dart';
-import '../../../../generated/google/protobuf/empty.pb.dart';
 
 class GameGrpcDataSource {
   final ClientChannel channel;
