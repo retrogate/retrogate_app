@@ -28,20 +28,35 @@ class _GamesListPageState extends State<GamesListPage> with SingleTickerProvider
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(_onTabChanged);
   }
 
   @override
   void dispose() {
+    _tabController.removeListener(_onTabChanged);
     _tabController.dispose();
     super.dispose();
+  }
+
+  void _onTabChanged() {
+    if (mounted && _tabController.indexIsChanging) {
+      // Unfocus current widget and focus first widget in new tab
+      FocusManager.instance.primaryFocus?.unfocus();
+      
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          FocusScope.of(context).nextFocus();
+        }
+      });
+    }
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     
-    // Register menu button action to toggle drawer
     if (!_hasRegisteredActions) {
+      // Register menu button action to toggle drawer
       GamepadNavigationScope.registerMenuAction(context, () {
         final scaffoldState = _scaffoldKey.currentState;
         if (scaffoldState != null) {
@@ -50,6 +65,19 @@ class _GamesListPageState extends State<GamesListPage> with SingleTickerProvider
           } else {
             scaffoldState.openDrawer(); // Open drawer
           }
+        }
+      });
+      
+      // Register L1/R1 for tab navigation
+      GamepadNavigationScope.registerLeftBumperAction(context, () {
+        if (_tabController.index > 0) {
+          _tabController.animateTo(_tabController.index - 1);
+        }
+      });
+      
+      GamepadNavigationScope.registerRightBumperAction(context, () {
+        if (_tabController.index < _tabController.length - 1) {
+          _tabController.animateTo(_tabController.index + 1);
         }
       });
       

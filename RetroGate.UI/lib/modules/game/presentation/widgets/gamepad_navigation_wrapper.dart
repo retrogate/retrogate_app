@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gamepads/gamepads.dart';
 
+/// Wrapper that provides grid-based navigation for game cards
+/// Handles its own gamepad input for grid navigation
 class GamepadNavigationWrapper extends StatefulWidget {
   final Widget child;
   final int itemCount;
@@ -28,42 +30,39 @@ class GamepadNavigationWrapper extends StatefulWidget {
 class _GamepadNavigationWrapperState extends State<GamepadNavigationWrapper> {
   int _selectedIndex = 0;
   StreamSubscription<GamepadEvent>? _gamepadSubscription;
-  List<String> _connectedGamepads = [];
 
   @override
   void initState() {
     super.initState();
-    _checkConnectedGamepads();
     _initGamepad();
   }
 
-  void _checkConnectedGamepads() async {
-    try {
-      final gamepads = await Gamepads.list();
-      setState(() {
-        _connectedGamepads = gamepads.map((g) => g.id).toList();
-      });
-    } catch (e) {
-      // Silently handle gamepad detection errors
-    }
+  @override
+  void dispose() {
+    _gamepadSubscription?.cancel();
+    super.dispose();
   }
 
   void _initGamepad() {
     _gamepadSubscription = Gamepads.events.listen((event) {
-      if (event.type == KeyType.button) {
-        _handleButtonInput(event);
-      } else if (event.type == KeyType.analog) {
-        _handleAnalogInput(event);
+      if (!widget.enabled || !mounted) return;
+      
+      try {
+        if (event.type == KeyType.button) {
+          _handleButtonInput(event);
+        } else if (event.type == KeyType.analog) {
+          _handleAnalogInput(event);
+        }
+      } catch (e) {
+        debugPrint('Gamepad grid navigation error: $e');
       }
     });
   }
 
   void _handleButtonInput(GamepadEvent event) {
-    if (!widget.enabled) return; // Ignore input when disabled
-    if (event.value < 0.5) return; // Button not pressed enough
+    if (event.value < 0.5) return;
     
     switch (event.key) {
-      // Xbox controller buttons
       case 'button_a':
       case 'button_cross':
       case '0':
@@ -74,34 +73,61 @@ class _GamepadNavigationWrapperState extends State<GamepadNavigationWrapper> {
   }
 
   void _handleAnalogInput(GamepadEvent event) {
-    if (!widget.enabled) return; // Ignore input when disabled
-    
-    // POV (D-Pad) - Point of View hat switch
-    // Values in degrees * 100: 0=up, 9000=right, 18000=down, 27000=left, 65535=neutral
     if (event.key == 'pov') {
-      if (event.value == 65535.0) {
-        // Neutral position
-        return;
-      } else if (event.value >= 0.0 && event.value < 4500.0) {
-        // Up (0° ± 45°)
-        _moveSelection(-widget.crossAxisCount);
+      if (event.value == 65535.0) return; // Neutral
+      
+      if (event.value >= 0.0 && event.value < 4500.0) {
+        _moveSelection(-widget.crossAxisCount); // Up
       } else if (event.value >= 4500.0 && event.value < 13500.0) {
-        // Right (90° ± 45°)
-        _moveSelection(1);
+        _moveSelection(1); // Right
       } else if (event.value >= 13500.0 && event.value < 22500.0) {
-        // Down (180° ± 45°)
-        _moveSelection(widget.crossAxisCount);
+        _moveSelection(widget.crossAxisCount); // Down
       } else if (event.value >= 22500.0 && event.value < 31500.0) {
-        // Left (270° ± 45°)
-        _moveSelection(-1);
+        _moveSelection(-1); // Left
       }
-      return;
     }
-    
-    // Ignore all other analog inputs (left stick, right stick, triggers)
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Focus(
+      autofocus: widget.enabled,
+      onKeyEvent: (node, event) {
+        if (!widget.enabled) return KeyEventResult.ignored;
+        
+        // Keyboard fallback
+        if (event is KeyDownEvent) {
+          switch (event.logicalKey) {
+            case LogicalKeyboardKey.arrowUp:
+              _moveSelection(-widget.crossAxisCount);
+              return KeyEventResult.handled;
+            case LogicalKeyboardKey.arrowDown:
+              _moveSelection(widget.crossAxisCount);
+              return KeyEventResult.handled;
+            case LogicalKeyboardKey.arrowLeft:
+              _moveSelection(-1);
+              return KeyEventResult.handled;
+            case LogicalKeyboardKey.arrowRight:
+              _moveSelection(1);
+              return KeyEventResult.handled;
+            case LogicalKeyboardKey.enter:
+            case LogicalKeyboardKey.space:
+              _selectCurrentItem();
+              return KeyEventResult.handled;
+          }
+        }
+        return KeyEventResult.ignored;
+      },
+      child: GamepadSelectionProvider(
+        selectedIndex: _selectedIndex,
+        child: widget.child,
+      ),
+    );
   }
 
   void _moveSelection(int delta) {
+    if (!widget.enabled) return;
+    
     setState(() {
       final newIndex = _selectedIndex + delta;
       if (newIndex >= 0 && newIndex < widget.itemCount) {
@@ -116,7 +142,6 @@ class _GamepadNavigationWrapperState extends State<GamepadNavigationWrapper> {
       return;
     }
 
-    // Calculate the position of the selected item
     final scrollController = widget.scrollController!;
     final viewportHeight = scrollController.position.viewportDimension;
     final maxScroll = scrollController.position.maxScrollExtent;
@@ -126,7 +151,6 @@ class _GamepadNavigationWrapperState extends State<GamepadNavigationWrapper> {
     final totalRows = (widget.itemCount / widget.crossAxisCount).ceil();
     
     // Estimate the scroll position for this row
-    // This assumes uniform item heights
     final estimatedItemHeight = (maxScroll + viewportHeight) / totalRows;
     final targetScrollTop = row * estimatedItemHeight;
     final targetScrollBottom = (row + 1) * estimatedItemHeight;
@@ -154,90 +178,8 @@ class _GamepadNavigationWrapperState extends State<GamepadNavigationWrapper> {
   }
 
   void _selectCurrentItem() {
+    if (!widget.enabled) return;
     widget.onItemSelected(_selectedIndex);
-  }
-
-  @override
-  void dispose() {
-    _gamepadSubscription?.cancel();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Focus(
-          autofocus: true,
-          onKeyEvent: (node, event) {
-            // Ignore keyboard events if gamepad is connected (prevents double input)
-            if (_connectedGamepads.isNotEmpty) {
-              return KeyEventResult.ignored;
-            }
-            
-            // Keyboard fallback for testing without gamepad
-            if (event is KeyDownEvent) {
-              switch (event.logicalKey) {
-                case LogicalKeyboardKey.arrowUp:
-                  _moveSelection(-widget.crossAxisCount);
-                  return KeyEventResult.handled;
-                case LogicalKeyboardKey.arrowDown:
-                  _moveSelection(widget.crossAxisCount);
-                  return KeyEventResult.handled;
-                case LogicalKeyboardKey.arrowLeft:
-                  _moveSelection(-1);
-                  return KeyEventResult.handled;
-                case LogicalKeyboardKey.arrowRight:
-                  _moveSelection(1);
-                  return KeyEventResult.handled;
-                case LogicalKeyboardKey.enter:
-                case LogicalKeyboardKey.space:
-                  _selectCurrentItem();
-                  return KeyEventResult.handled;
-              }
-            }
-            return KeyEventResult.ignored;
-          },
-          child: GamepadSelectionProvider(
-            selectedIndex: _selectedIndex,
-            child: widget.child,
-          ),
-        ),
-        
-        // Gamepad status indicator
-        if (_connectedGamepads.isNotEmpty)
-          Positioned(
-            top: 16,
-            left: 16,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: const Color(0xFF66C0F4),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.gamepad,
-                    color: Colors.white,
-                    size: 16,
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    '${_connectedGamepads.length} gamepad(s)',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-      ],
-    );
   }
 }
 
