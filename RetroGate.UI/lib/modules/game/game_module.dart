@@ -1,10 +1,12 @@
 import 'package:flutter_modular/flutter_modular.dart';
-import 'domain/repositories/game_repository.dart';
+import 'domain/repositories/available_games_repository.dart';
+import 'domain/repositories/installed_games_repository.dart';
 import 'domain/usecases/get_all_games_usecase.dart';
 import 'domain/usecases/create_game_usecase.dart';
 import 'domain/usecases/get_game_images_usecase.dart';
 import 'infra/datasources/game_grpc_datasource.dart';
-import 'infra/repositories/game_repository_impl.dart';
+import 'infra/repositories/available_games_repository_impl.dart';
+import 'infra/repositories/installed_games_repository_impl.dart';
 import 'presentation/bloc/games_bloc.dart';
 import 'presentation/games_list_page.dart';
 import 'presentation/add_game_page.dart';
@@ -20,22 +22,26 @@ class GameModule extends Module {
       ),
     );
 
-    // Repository
-    i.addLazySingleton<IGameRepository>(
-      () => GameRepository(i.get<GameGrpcDataSource>()),
+    // Repositories
+    i.addLazySingleton<IAvailableGamesRepository>(
+      () => AvailableGamesRepositoryImpl(i.get<GameGrpcDataSource>()),
+    );
+    
+    i.addLazySingleton<IInstalledGamesRepository>(
+      () => InstalledGamesRepositoryImpl(i.get<GameGrpcDataSource>()),
     );
 
     // UseCases
     i.addLazySingleton<GetAllGamesUseCase>(
-      () => GetAllGamesUseCase(i.get<IGameRepository>()),
+      () => GetAllGamesUseCase(i.get<IAvailableGamesRepository>()),
     );
     
     i.addLazySingleton<CreateGameUseCase>(
-      () => CreateGameUseCase(i.get<IGameRepository>()),
+      () => CreateGameUseCase(i.get<IAvailableGamesRepository>()),
     );
     
     i.addLazySingleton<GetGameImagesUseCase>(
-      () => GetGameImagesUseCase(i.get<IGameRepository>()),
+      () => GetGameImagesUseCase(i.get<IAvailableGamesRepository>()),
     );
 
     // BLoC

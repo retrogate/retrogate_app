@@ -1,16 +1,15 @@
 import 'package:dartz/dartz.dart';
 import 'package:retrogate_ui/modules/game/domain/models/game_source.dart';
 import '../../domain/models/game.dart';
-import '../../domain/models/game_images.dart';
-import '../../domain/repositories/game_repository.dart';
+import '../../domain/repositories/installed_games_repository.dart';
 import '../datasources/game_grpc_datasource.dart';
 import '../../../../generated/game/proto/v1/game_model.pb.dart' as proto;
 import '../../../../generated/game/proto/v1/game_service.pb.dart' as proto;
 
-class GameRepository implements IGameRepository {
+class InstalledGamesRepositoryImpl implements IInstalledGamesRepository {
   final GameGrpcDataSource dataSource;
 
-  GameRepository(this.dataSource);
+  InstalledGamesRepositoryImpl(this.dataSource);
 
   @override
   Future<Either<Exception, List<Game>>> getAll(GameSource source) async {
@@ -46,23 +45,11 @@ class GameRepository implements IGameRepository {
   }
 
   @override
-  Future<Either<Exception, GameImages>> getImages(String gameName) async {
+  Future<Either<Exception, List<Game>>> findInstalledGames() async {
     try {
-      final protoImages = await dataSource.getImages(gameName);
-      final images = GameImages.fromProto(protoImages);
-      return Right(images);
-    } catch (e) {
-      return Left(Exception(e.toString()));
-    }
-  }
-
-  @override
-  Future<Either<Exception, Game>> create(GameSource source, Game game) async {
-    try {
-      final protoGame = _toProto(game);
-      final createdProto = await dataSource.create(_gameSource(source), protoGame);
-      final createdGame = Game.fromProto(createdProto);
-      return Right(createdGame);
+      // TODO: Implementar chamada gRPC específica para jogos instalados
+      // Por enquanto, retorna lista vazia
+      return const Right([]);
     } catch (e) {
       return Left(Exception(e.toString()));
     }

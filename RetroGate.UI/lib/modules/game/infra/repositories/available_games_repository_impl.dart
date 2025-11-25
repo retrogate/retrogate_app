@@ -2,15 +2,15 @@ import 'package:dartz/dartz.dart';
 import 'package:retrogate_ui/modules/game/domain/models/game_source.dart';
 import '../../domain/models/game.dart';
 import '../../domain/models/game_images.dart';
-import '../../domain/repositories/game_repository.dart';
+import '../../domain/repositories/available_games_repository.dart';
 import '../datasources/game_grpc_datasource.dart';
 import '../../../../generated/game/proto/v1/game_model.pb.dart' as proto;
 import '../../../../generated/game/proto/v1/game_service.pb.dart' as proto;
 
-class GameRepository implements IGameRepository {
+class AvailableGamesRepositoryImpl implements IAvailableGamesRepository {
   final GameGrpcDataSource dataSource;
 
-  GameRepository(this.dataSource);
+  AvailableGamesRepositoryImpl(this.dataSource);
 
   @override
   Future<Either<Exception, List<Game>>> getAll(GameSource source) async {

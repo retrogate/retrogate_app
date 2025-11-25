@@ -1,9 +1,9 @@
 import 'package:dartz/dartz.dart';
 import '../models/game_images.dart';
-import '../repositories/game_repository.dart';
+import '../repositories/available_games_repository.dart';
 
 class GetGameImagesUseCase {
-  final IGameRepository repository;
+  final IAvailableGamesRepository repository;
 
   GetGameImagesUseCase(this.repository);
 
