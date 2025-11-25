@@ -1,7 +1,6 @@
 {
   "version": "0.2.0",
   "configurations": [
-    
     {
       "name": "Launch RetroGate.CLI",
       "type": "coreclr",
@@ -28,9 +27,10 @@
       }
     },
     {
-      "name": "Attach to Process",
-      "type": "coreclr",
-      "request": "attach"
-    }
+      "name": "Launch RetroGate.UI",
+      "type": "dart",
+      "request": "launch",
+      "program": "${workspaceFolder}/RetroGate.UI/lib/main.dart"
+    },
   ]
 }
