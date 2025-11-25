@@ -1,24 +1,23 @@
 import 'package:dartz/dartz.dart';
-import 'package:retrogate_ui/modules/game/domain/models/game_source.dart';
-import '../models/game.dart';
+import '../models/game_source.dart';
 import '../repositories/available_games_repository.dart';
 import '../repositories/installed_games_repository.dart';
 
-class CreateGameUseCase {
+class DeleteGameUseCase {
   final IAvailableGamesRepository availableGamesRepository;
   final IInstalledGamesRepository installedGamesRepository;
 
-  CreateGameUseCase({
+  DeleteGameUseCase({
     required this.availableGamesRepository,
     required this.installedGamesRepository,
   });
 
-  Future<Either<Exception, Game>> call(GameSource source, Game game) async {
+  Future<Either<Exception, void>> call(GameSource source, String id) async {
     switch (source) {
       case GameSource.available:
-        return await availableGamesRepository.create(source, game);
+        return await availableGamesRepository.delete(source, id);
       case GameSource.installed:
-        return await installedGamesRepository.create(source, game);
+        return await installedGamesRepository.delete(source, id);
     }
   }
 }

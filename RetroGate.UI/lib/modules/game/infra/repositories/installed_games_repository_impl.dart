@@ -12,6 +12,18 @@ class InstalledGamesRepositoryImpl implements IInstalledGamesRepository {
   InstalledGamesRepositoryImpl(this.dataSource);
 
   @override
+  Future<Either<Exception, Game>> create(GameSource source, Game game) async {
+    try {
+      final protoGame = _toProto(game);
+      final createdProto = await dataSource.create(_gameSource(source), protoGame);
+      final createdGame = Game.fromProto(createdProto);
+      return Right(createdGame);
+    } catch (e) {
+      return Left(Exception(e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Exception, List<Game>>> getAll(GameSource source) async {
     try {
       final protoGames = await dataSource.getAll(_gameSource(source));

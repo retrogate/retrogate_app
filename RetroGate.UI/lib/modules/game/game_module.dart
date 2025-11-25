@@ -3,7 +3,12 @@ import 'domain/repositories/available_games_repository.dart';
 import 'domain/repositories/installed_games_repository.dart';
 import 'domain/usecases/get_all_games_usecase.dart';
 import 'domain/usecases/create_game_usecase.dart';
+import 'domain/usecases/update_game_usecase.dart';
+import 'domain/usecases/delete_game_usecase.dart';
+import 'domain/usecases/get_game_by_id_usecase.dart';
+import 'domain/usecases/find_game_by_name_usecase.dart';
 import 'domain/usecases/get_game_images_usecase.dart';
+import 'domain/usecases/get_installed_games_usecase.dart';
 import 'infra/datasources/game_grpc_datasource.dart';
 import 'infra/repositories/available_games_repository_impl.dart';
 import 'infra/repositories/installed_games_repository_impl.dart';
@@ -31,20 +36,59 @@ class GameModule extends Module {
       () => InstalledGamesRepositoryImpl(i.get<GameGrpcDataSource>()),
     );
 
-    // UseCases
+    // UseCases - Dual repository (switch on GameSource)
     i.addLazySingleton<GetAllGamesUseCase>(
-      () => GetAllGamesUseCase(i.get<IAvailableGamesRepository>()),
+      () => GetAllGamesUseCase(
+        availableGamesRepository: i.get<IAvailableGamesRepository>(),
+        installedGamesRepository: i.get<IInstalledGamesRepository>(),
+      ),
     );
     
     i.addLazySingleton<CreateGameUseCase>(
-      () => CreateGameUseCase(i.get<IAvailableGamesRepository>()),
+      () => CreateGameUseCase(
+        availableGamesRepository: i.get<IAvailableGamesRepository>(),
+        installedGamesRepository: i.get<IInstalledGamesRepository>(),
+      ),
     );
     
+    i.addLazySingleton<UpdateGameUseCase>(
+      () => UpdateGameUseCase(
+        availableGamesRepository: i.get<IAvailableGamesRepository>(),
+        installedGamesRepository: i.get<IInstalledGamesRepository>(),
+      ),
+    );
+    
+    i.addLazySingleton<DeleteGameUseCase>(
+      () => DeleteGameUseCase(
+        availableGamesRepository: i.get<IAvailableGamesRepository>(),
+        installedGamesRepository: i.get<IInstalledGamesRepository>(),
+      ),
+    );
+    
+    i.addLazySingleton<GetGameByIdUseCase>(
+      () => GetGameByIdUseCase(
+        availableGamesRepository: i.get<IAvailableGamesRepository>(),
+        installedGamesRepository: i.get<IInstalledGamesRepository>(),
+      ),
+    );
+    
+    i.addLazySingleton<FindGameByNameUseCase>(
+      () => FindGameByNameUseCase(
+        availableGamesRepository: i.get<IAvailableGamesRepository>(),
+        installedGamesRepository: i.get<IInstalledGamesRepository>(),
+      ),
+    );
+    
+    // UseCases - Single repository (no switching)
     i.addLazySingleton<GetGameImagesUseCase>(
       () => GetGameImagesUseCase(i.get<IAvailableGamesRepository>()),
     );
+    
+    i.addLazySingleton<GetInstalledGamesUseCase>(
+      () => GetInstalledGamesUseCase(i.get<IInstalledGamesRepository>()),
+    );
 
-    // BLoC
+    // BLoCs
     i.add<GamesBloc>(
       () => GamesBloc(
         getAllGamesUseCase: i.get<GetAllGamesUseCase>(),
