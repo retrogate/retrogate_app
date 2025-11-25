@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:window_manager/window_manager.dart';
 import 'gamepad_focusable.dart';
 
 class AppDrawer extends StatelessWidget {
@@ -93,6 +94,25 @@ class AppDrawer extends StatelessWidget {
             ),
           ),
           const Spacer(),
+          const Divider(color: Color(0xFF2A475E)),
+          GamepadFocusable(
+            onPressed: () async {
+              await windowManager.close();
+            },
+            child: ListTile(
+              leading: const Icon(
+                Icons.exit_to_app,
+                color: Colors.redAccent,
+              ),
+              title: const Text(
+                'Exit',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ),
           const Divider(color: Color(0xFF2A475E)),
           Padding(
             padding: const EdgeInsets.all(16.0),
