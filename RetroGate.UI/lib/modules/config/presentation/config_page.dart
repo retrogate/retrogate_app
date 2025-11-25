@@ -71,6 +71,20 @@ class _ConfigPageState extends State<ConfigPage> with SingleTickerProviderStateM
         Modular.to.navigate('/games/');
       });
       
+      // Left bumper (L1/LB) - previous tab
+      GamepadNavigationScope.registerLeftBumperAction(context, () {
+        if (_tabController.index > 0) {
+          _tabController.animateTo(_tabController.index - 1);
+        }
+      });
+      
+      // Right bumper (R1/RB) - next tab
+      GamepadNavigationScope.registerRightBumperAction(context, () {
+        if (_tabController.index < _tabController.length - 1) {
+          _tabController.animateTo(_tabController.index + 1);
+        }
+      });
+      
       _hasRegisteredActions = true;
     }
   }

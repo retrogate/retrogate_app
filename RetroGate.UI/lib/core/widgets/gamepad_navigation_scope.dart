@@ -30,6 +30,16 @@ class GamepadNavigationScope extends StatefulWidget {
     of(context)?.registerBackAction(callback);
   }
   
+  /// Register a callback for left bumper (L1/LB)
+  static void registerLeftBumperAction(BuildContext context, VoidCallback callback) {
+    of(context)?.registerLeftBumperAction(callback);
+  }
+  
+  /// Register a callback for right bumper (R1/RB)
+  static void registerRightBumperAction(BuildContext context, VoidCallback callback) {
+    of(context)?.registerRightBumperAction(callback);
+  }
+  
   /// Unregister the menu button callback
   static void unregisterMenuAction(BuildContext context) {
     of(context)?.unregisterMenuAction();
@@ -38,6 +48,16 @@ class GamepadNavigationScope extends StatefulWidget {
   /// Unregister the back button callback
   static void unregisterBackAction(BuildContext context) {
     of(context)?.unregisterBackAction();
+  }
+  
+  /// Unregister left bumper callback
+  static void unregisterLeftBumperAction(BuildContext context) {
+    of(context)?.unregisterLeftBumperAction();
+  }
+  
+  /// Unregister right bumper callback
+  static void unregisterRightBumperAction(BuildContext context) {
+    of(context)?.unregisterRightBumperAction();
   }
 }
 
@@ -48,6 +68,8 @@ class _GamepadNavigationScopeState extends State<GamepadNavigationScope> {
   // Custom actions that can be registered by widgets
   VoidCallback? _onMenuButtonPressed;
   VoidCallback? _onBackButtonPressed;
+  VoidCallback? _onLeftBumperPressed;
+  VoidCallback? _onRightBumperPressed;
 
   @override
   void initState() {
@@ -114,6 +136,22 @@ class _GamepadNavigationScopeState extends State<GamepadNavigationScope> {
           _activateFocusedWidget();
         }
         break;
+      
+      // Left bumper (L1/LB)
+      case 'button_l1':
+      case 'button_lb':
+      case '4':
+      case 'button-4':
+        _onLeftBumperPressed?.call();
+        break;
+      
+      // Right bumper (R1/RB)
+      case 'button_r1':
+      case 'button_rb':
+      case '5':
+      case 'button-5':
+        _onRightBumperPressed?.call();
+        break;
     }
   }
 
@@ -175,16 +213,30 @@ class _GamepadNavigationScopeState extends State<GamepadNavigationScope> {
   void registerBackAction(VoidCallback callback) {
     _onBackButtonPressed = callback;
   }
-
+  
+  void registerLeftBumperAction(VoidCallback callback) {
+    _onLeftBumperPressed = callback;
+  }
+  
+  void registerRightBumperAction(VoidCallback callback) {
+    _onRightBumperPressed = callback;
+  }
+  
   void unregisterMenuAction() {
     _onMenuButtonPressed = null;
   }
-
+  
   void unregisterBackAction() {
     _onBackButtonPressed = null;
   }
-
-  bool get hasGamepad => _connectedGamepads.isNotEmpty;
+  
+  void unregisterLeftBumperAction() {
+    _onLeftBumperPressed = null;
+  }
+  
+  void unregisterRightBumperAction() {
+    _onRightBumperPressed = null;
+  }  bool get hasGamepad => _connectedGamepads.isNotEmpty;
 
   int get gamepadCount => _connectedGamepads.length;
 
