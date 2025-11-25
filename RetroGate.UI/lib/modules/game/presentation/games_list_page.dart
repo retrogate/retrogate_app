@@ -294,10 +294,35 @@ class _GamesListBody extends StatelessWidget {
         ),
         // Games Grid
         Expanded(
-          child: _buildGamesGrid(games),
+          child: _GamesGrid(games: games, isDrawerOpen: isDrawerOpen),
         ),
       ],
     );
+  }
+}
+
+class _GamesGrid extends StatefulWidget {
+  final List<Game> games;
+  final bool isDrawerOpen;
+
+  const _GamesGrid({required this.games, required this.isDrawerOpen});
+
+  @override
+  State<_GamesGrid> createState() => _GamesGridState();
+}
+
+class _GamesGridState extends State<_GamesGrid> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _buildGamesGrid(widget.games);
   }
 
   Widget _buildGamesGrid(List<Game> games) {
@@ -323,7 +348,8 @@ class _GamesListBody extends StatelessWidget {
         return GamepadNavigationWrapper(
           itemCount: games.length,
           crossAxisCount: crossAxisCount,
-          enabled: !isDrawerOpen, // Disable when drawer is open
+          enabled: !widget.isDrawerOpen, // Disable when drawer is open
+          scrollController: _scrollController,
           onItemSelected: (index) {
             // TODO: Navigate to game details or launch game
             final game = games[index];
@@ -336,6 +362,7 @@ class _GamesListBody extends StatelessWidget {
             );
           },
           child: GridView.builder(
+            controller: _scrollController,
             padding: const EdgeInsets.all(16),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: crossAxisCount,

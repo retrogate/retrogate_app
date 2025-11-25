@@ -9,6 +9,7 @@ class GamepadNavigationWrapper extends StatefulWidget {
   final int crossAxisCount;
   final Function(int index) onItemSelected;
   final bool enabled;
+  final ScrollController? scrollController;
 
   const GamepadNavigationWrapper({
     super.key,
@@ -17,6 +18,7 @@ class GamepadNavigationWrapper extends StatefulWidget {
     required this.crossAxisCount,
     required this.onItemSelected,
     this.enabled = true,
+    this.scrollController,
   });
 
   @override
@@ -110,8 +112,45 @@ class _GamepadNavigationWrapperState extends State<GamepadNavigationWrapper> {
   }
 
   void _scrollToSelected() {
-    // TODO: Implement auto-scroll to keep selected item visible
-    // This would require a ScrollController passed from parent
+    if (widget.scrollController == null || !widget.scrollController!.hasClients) {
+      return;
+    }
+
+    // Calculate the position of the selected item
+    final scrollController = widget.scrollController!;
+    final viewportHeight = scrollController.position.viewportDimension;
+    final maxScroll = scrollController.position.maxScrollExtent;
+    
+    // Calculate row and approximate item height
+    final row = _selectedIndex ~/ widget.crossAxisCount;
+    final totalRows = (widget.itemCount / widget.crossAxisCount).ceil();
+    
+    // Estimate the scroll position for this row
+    // This assumes uniform item heights
+    final estimatedItemHeight = (maxScroll + viewportHeight) / totalRows;
+    final targetScrollTop = row * estimatedItemHeight;
+    final targetScrollBottom = (row + 1) * estimatedItemHeight;
+    
+    final currentScroll = scrollController.offset;
+    final currentViewportBottom = currentScroll + viewportHeight;
+    
+    // Scroll if item is not fully visible
+    if (targetScrollTop < currentScroll) {
+      // Item is above viewport, scroll up
+      scrollController.animateTo(
+        targetScrollTop,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    } else if (targetScrollBottom > currentViewportBottom) {
+      // Item is below viewport, scroll down
+      final newScroll = targetScrollBottom - viewportHeight;
+      scrollController.animateTo(
+        newScroll.clamp(0.0, maxScroll),
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
   }
 
   void _selectCurrentItem() {
