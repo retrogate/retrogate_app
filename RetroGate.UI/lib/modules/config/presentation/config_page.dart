@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:window_manager/window_manager.dart';
 import '../../../core/widgets/gamepad_navigation_scope.dart';
+import '../../../core/widgets/gamepad_focusable.dart';
 import '../../../core/widgets/app_drawer.dart';
 import '../../../core/preferences/app_preferences.dart';
 import 'bloc/config_bloc.dart';
@@ -36,8 +37,16 @@ class _ConfigPageState extends State<ConfigPage> with SingleTickerProviderStateM
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(_onTabChanged);
     BlocProvider.of<ConfigBloc>(context).add(LoadConfig());
     _loadAppPreferences();
+  }
+  
+  void _onTabChanged() {
+    // When tab changes, unfocus current widget to allow navigation in new tab
+    if (mounted && _tabController.indexIsChanging) {
+      FocusManager.instance.primaryFocus?.unfocus();
+    }
   }
   
   void _loadAppPreferences() {
@@ -73,14 +82,14 @@ class _ConfigPageState extends State<ConfigPage> with SingleTickerProviderStateM
       
       // Left bumper (L1/LB) - previous tab
       GamepadNavigationScope.registerLeftBumperAction(context, () {
-        if (_tabController.index > 0) {
+        if (mounted && _tabController.index > 0) {
           _tabController.animateTo(_tabController.index - 1);
         }
       });
       
       // Right bumper (R1/RB) - next tab
       GamepadNavigationScope.registerRightBumperAction(context, () {
-        if (_tabController.index < _tabController.length - 1) {
+        if (mounted && _tabController.index < _tabController.length - 1) {
           _tabController.animateTo(_tabController.index + 1);
         }
       });
@@ -91,6 +100,7 @@ class _ConfigPageState extends State<ConfigPage> with SingleTickerProviderStateM
 
   @override
   void dispose() {
+    _tabController.removeListener(_onTabChanged);
     _tabController.dispose();
     _steamPathController.dispose();
     _steamUserIdController.dispose();
@@ -462,50 +472,52 @@ class _ConfigPageState extends State<ConfigPage> with SingleTickerProviderStateM
     required bool value,
     required Function(bool) onChanged,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFF171A21),
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: const Color(0xFF2A475E), width: 1),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            icon,
-            color: const Color(0xFF66C0F4),
-            size: 28,
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  subtitle,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.6),
-                    fontSize: 13,
-                  ),
-                ),
-              ],
+    return GamepadFocusable(
+      onPressed: () => onChanged(!value),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: const Color(0xFF171A21),
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              color: const Color(0xFF66C0F4),
+              size: 28,
             ),
-          ),
-          Switch(
-            value: value,
-            onChanged: onChanged,
-            activeTrackColor: const Color(0xFF66C0F4),
-          ),
-        ],
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.6),
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Switch(
+              value: value,
+              onChanged: onChanged,
+              activeTrackColor: const Color(0xFF66C0F4),
+            ),
+          ],
+        ),
       ),
     );
   }

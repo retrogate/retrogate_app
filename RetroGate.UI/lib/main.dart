@@ -16,13 +16,13 @@ void main() async {
   
   // Read fullscreen preference
   final startFullscreen = AppPreferences.isFullscreenEnabled();
-  final windowWidth = AppPreferences.getWindowWidth();
-  final windowHeight = AppPreferences.getWindowHeight();
+  // final windowWidth = AppPreferences.getWindowWidth();
+  // final windowHeight = AppPreferences.getWindowHeight();
   
   WindowOptions windowOptions = WindowOptions(
-    size: Size(windowWidth, windowHeight),
-    minimumSize: const Size(800, 600),
-    center: true,
+    // size: Size(windowWidth, windowHeight),
+    // minimumSize: const Size(800, 600),
+    // center: true,
     backgroundColor: const Color(0xFF1B2838),
     skipTaskbar: false,
     titleBarStyle: TitleBarStyle.normal, // Use normal title bar so window can be dragged
