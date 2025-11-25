@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import '../../domain/models/game.dart';
+import '../../domain/models/game_source.dart';
 
 abstract class GamesEvent extends Equatable {
   const GamesEvent();
@@ -9,20 +10,31 @@ abstract class GamesEvent extends Equatable {
 }
 
 class LoadGamesEvent extends GamesEvent {
-  const LoadGamesEvent();
+  final GameSource source;
+  
+  const LoadGamesEvent(this.source);
+  
+  @override
+  List<Object?> get props => [source];
 }
 
 class RefreshGamesEvent extends GamesEvent {
-  const RefreshGamesEvent();
+  final GameSource source;
+  
+  const RefreshGamesEvent(this.source);
+  
+  @override
+  List<Object?> get props => [source];
 }
 
 class CreateGameEvent extends GamesEvent {
+  final GameSource source;
   final Game game;
 
-  const CreateGameEvent(this.game);
+  const CreateGameEvent(this.source, this.game);
 
   @override
-  List<Object?> get props => [game];
+  List<Object?> get props => [source, game];
 }
 
 class LoadGameImagesEvent extends GamesEvent {

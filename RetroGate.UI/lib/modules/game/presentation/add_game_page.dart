@@ -5,6 +5,7 @@ import '../../../core/widgets/gamepad_navigation_scope.dart';
 import '../../../core/widgets/gamepad_focusable.dart';
 import '../../../core/widgets/app_drawer.dart';
 import '../domain/models/game.dart';
+import '../domain/models/game_source.dart';
 import 'bloc/games_bloc.dart';
 import 'bloc/games_event.dart';
 import 'bloc/games_state.dart';
@@ -90,7 +91,7 @@ class _AddGamePageState extends State<AddGamePage> {
         settingsFile: settingsFile.isEmpty ? null : settingsFile,
       );
 
-      _bloc.add(CreateGameEvent(game));
+      _bloc.add(CreateGameEvent(GameSource.available, game));
     }
   }
 
@@ -136,7 +137,7 @@ class _AddGamePageState extends State<AddGamePage> {
             // Mark that we just created a game
             _gameJustCreated = true;
             // Reload games list
-            _bloc.add(const LoadGamesEvent());
+            _bloc.add(const LoadGamesEvent(GameSource.available));
           } else if (state is GamesLoadedState && _gameJustCreated) {
             // Games reloaded after creation - now we can go back
             _gameJustCreated = false;

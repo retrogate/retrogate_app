@@ -24,18 +24,18 @@ class GamesBloc extends Bloc<GamesEvent, GamesState> {
 
   Future<void> _onLoadGames(LoadGamesEvent event, Emitter<GamesState> emit) async {
     emit(const GamesLoadingState());
-    await _fetchGames(emit);
+    await _fetchGames(event.source, emit);
   }
 
   Future<void> _onRefreshGames(RefreshGamesEvent event, Emitter<GamesState> emit) async {
     emit(const GamesLoadingState());
-    await _fetchGames(emit);
+    await _fetchGames(event.source, emit);
   }
 
   Future<void> _onCreateGame(CreateGameEvent event, Emitter<GamesState> emit) async {
     emit(const GameCreatingState());
 
-    final result = await createGameUseCase(GameSource.available, event.game);
+    final result = await createGameUseCase(event.source, event.game);
 
     result.fold(
       (error) {
@@ -44,7 +44,7 @@ class GamesBloc extends Bloc<GamesEvent, GamesState> {
       (createdGame) {
         emit(GameCreatedState(createdGame));
         // Reload games list after creating
-        add(const LoadGamesEvent());
+        add(LoadGamesEvent(event.source));
       },
     );
   }
@@ -64,8 +64,8 @@ class GamesBloc extends Bloc<GamesEvent, GamesState> {
     );
   }
 
-  Future<void> _fetchGames(Emitter<GamesState> emit) async {
-    final result = await getAllGamesUseCase(GameSource.available);
+  Future<void> _fetchGames(GameSource source, Emitter<GamesState> emit) async {
+    final result = await getAllGamesUseCase(source);
 
     result.fold(
       (error) {

@@ -1,0 +1,101 @@
+import 'package:flutter/material.dart';
+import '../../domain/models/game.dart';
+import 'game_card.dart';
+import 'gamepad_navigation_wrapper.dart';
+
+class GamesGrid extends StatefulWidget {
+  final List<Game> games;
+  final bool isDrawerOpen;
+  final void Function(Game game, int index)? onGameSelected;
+
+  const GamesGrid({
+    super.key,
+    required this.games,
+    this.isDrawerOpen = false,
+    this.onGameSelected,
+  });
+
+  @override
+  State<GamesGrid> createState() => _GamesGridState();
+}
+
+class _GamesGridState extends State<GamesGrid> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Responsive grid: more columns on wider screens
+        // Adjusted for vertical poster images
+        int crossAxisCount;
+        if (constraints.maxWidth > 1400) {
+          crossAxisCount = 6;
+        } else if (constraints.maxWidth > 1100) {
+          crossAxisCount = 5;
+        } else if (constraints.maxWidth > 900) {
+          crossAxisCount = 4;
+        } else if (constraints.maxWidth > 600) {
+          crossAxisCount = 3;
+        } else if (constraints.maxWidth > 400) {
+          crossAxisCount = 2;
+        } else {
+          crossAxisCount = 1;
+        }
+
+        return GamepadNavigationWrapper(
+          itemCount: widget.games.length,
+          crossAxisCount: crossAxisCount,
+          enabled: !widget.isDrawerOpen, // Disable when drawer is open
+          scrollController: _scrollController,
+          onItemSelected: (index) {
+            final game = widget.games[index];
+            
+            // Call custom callback if provided
+            if (widget.onGameSelected != null) {
+              widget.onGameSelected!(game, index);
+            } else {
+              // Default behavior: show snackbar
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Selected: ${game.name}'),
+                  duration: const Duration(seconds: 2),
+                  backgroundColor: const Color(0xFF66C0F4),
+                ),
+              );
+            }
+          },
+          child: GridView.builder(
+            controller: _scrollController,
+            padding: const EdgeInsets.all(16),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: crossAxisCount,
+              childAspectRatio: 3 / 4, // Portrait ratio for poster images (vertical)
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+            ),
+            itemCount: widget.games.length,
+            itemBuilder: (context, index) {
+              final game = widget.games[index];
+              return GameCard(
+                game: game,
+                index: index,
+                onTap: () {
+                  if (widget.onGameSelected != null) {
+                    widget.onGameSelected!(game, index);
+                  }
+                },
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+}
