@@ -16,10 +16,11 @@ namespace RetroGate.Grpc.Services
         IGetGameImages getGameImages
     ) : Protos.Game.Proto.V1.GameService.GameServiceBase
     {
-        public override async Task<GameModel> Create(GameModel request, ServerCallContext context)
+        public override async Task<GameModel> Create(CreateGameRequest request, ServerCallContext context)
         {
-            var domainModel = request.ToDomain();
-            var result = await createGame.Call(domainModel);
+            var domainModel = request.Game.ToDomain();
+            var source = request.Source.ToDomain();
+            var result = await createGame.Call(source, domainModel);
             return result.Match(
                 Right: game => game.ToProto(),
                 Left: error => throw new RpcException(new Status(StatusCode.Internal, error.Message))
@@ -28,7 +29,8 @@ namespace RetroGate.Grpc.Services
 
         public override async Task<FindByNameResponse> FindByName(FindByNameRequest request, ServerCallContext context)
         {
-            var result = await findGameByName.Call(request.Name);
+            var source = request.Source.ToDomain();
+            var result = await findGameByName.Call(source, request.Name);
             return result.Match(
                 Right: games =>
                 {
@@ -40,9 +42,10 @@ namespace RetroGate.Grpc.Services
             );
         }
 
-        public override async Task<GetAllResponse> GetAll(Empty request, ServerCallContext context)
+        public override async Task<GetAllResponse> GetAll(GetAllRequest request, ServerCallContext context)
         {
-            var result = await getAllGames.Call();
+            var source = request.Source.ToDomain();
+            var result = await getAllGames.Call(source);
             return result.Match(
                 Right: games =>
                 {
@@ -56,16 +59,19 @@ namespace RetroGate.Grpc.Services
 
         public override async Task<GameModel> GetById(GetByIdRequest request, ServerCallContext context)
         {
-            var result = await getGameById.Call(request.Id);
+            var source = request.Source.ToDomain();
+            var result = await getGameById.Call(source, request.Id);
             return result.Match(
                 Right: game => game.ToProto(),
                 Left: error => throw new RpcException(new Status(StatusCode.Internal, error.Message))
             );
         }
 
-        public override async Task<GameModel> Update(GameModel request, ServerCallContext context)
+        public override async Task<GameModel> Update(UpdateGameRequest request, ServerCallContext context)
         {
-            var result = await updateGame.Call(request.ToDomain());
+            var source = request.Source.ToDomain();
+            var domainModel = request.Game.ToDomain();
+            var result = await updateGame.Call(source, domainModel);
             return result.Match(
                 Right: game => game.ToProto(),
                 Left: error => throw new RpcException(new Status(StatusCode.Internal, error.Message))
@@ -74,7 +80,8 @@ namespace RetroGate.Grpc.Services
 
         public override async Task<Empty> Delete(GetByIdRequest request, ServerCallContext context)
         {
-            var result = await deleteGame.Call(request.Id);
+            var source = request.Source.ToDomain();
+            var result = await deleteGame.Call(source, request.Id);
             return result.Match(
                 Right: _ => new Empty(),
                 Left: error => throw new RpcException(new Status(StatusCode.Internal, error.Message))

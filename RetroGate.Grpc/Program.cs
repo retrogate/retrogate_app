@@ -46,7 +46,8 @@ builder.Services.AddSingleton<IGetAllShortcuts, GetAllShortcuts>();
 builder.Services.AddSingleton<ICreateShortcut, CreateShortcut>();
 
 // Game service instances
-builder.Services.AddSingleton<IGameRepository, GameRepository>();
+builder.Services.AddSingleton<IAvailableGamesRepository, AvailableGamesRepository>();
+builder.Services.AddSingleton<IInstalledGamesRepository, InstalledGamesRepository>();
 builder.Services.AddSingleton<IGameImagesRepository, GameImagesRepository>();
 builder.Services.AddSingleton<ICreateGame, CreateGame>();
 builder.Services.AddSingleton<IFindGameByName, FindGameByName>();

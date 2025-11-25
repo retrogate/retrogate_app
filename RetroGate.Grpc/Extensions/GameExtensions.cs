@@ -76,5 +76,25 @@ namespace RetroGate.Grpc.Extensions
                 LogoUrl = proto.LogoUrl
             };
         }
+
+        public static GameSource ToProto(SDK.Game.Domain.Models.GameSource source)
+        {
+            return source switch
+            {
+                SDK.Game.Domain.Models.GameSource.AvailableGames => GameSource.Available,
+                SDK.Game.Domain.Models.GameSource.InstalledGames => GameSource.Installed,
+                _ => throw new ArgumentOutOfRangeException(nameof(source), source, null)
+            };
+        }
+
+        public static SDK.Game.Domain.Models.GameSource ToDomain(this GameSource proto)
+        {
+            return proto switch
+            {
+                GameSource.Available => SDK.Game.Domain.Models.GameSource.AvailableGames,
+                GameSource.Installed => SDK.Game.Domain.Models.GameSource.InstalledGames,
+                _ => throw new ArgumentOutOfRangeException(nameof(proto), proto, null)
+            };
+        }
     }
 }
