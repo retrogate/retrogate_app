@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../domain/models/game.dart';
+import '../../domain/models/game_source.dart';
 import 'game_card.dart';
 import 'gamepad_navigation_wrapper.dart';
 
@@ -7,12 +8,14 @@ class GamesGrid extends StatefulWidget {
   final List<Game> games;
   final bool isDrawerOpen;
   final void Function(Game game, int index)? onGameSelected;
+  final GameSource source;
 
   const GamesGrid({
     super.key,
     required this.games,
     this.isDrawerOpen = false,
     this.onGameSelected,
+    required this.source,
   });
 
   @override
@@ -86,6 +89,7 @@ class _GamesGridState extends State<GamesGrid> {
               return GameCard(
                 game: game,
                 index: index,
+                source: widget.source,
                 onTap: () {
                   if (widget.onGameSelected != null) {
                     widget.onGameSelected!(game, index);

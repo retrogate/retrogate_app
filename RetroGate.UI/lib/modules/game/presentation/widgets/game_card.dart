@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import '../../domain/models/game.dart';
+import '../../domain/models/game_source.dart';
 import 'gamepad_navigation_wrapper.dart';
 
 class GameCard extends StatefulWidget {
   final Game game;
   final int index;
   final VoidCallback? onTap;
+  final GameSource source;
 
   const GameCard({
     super.key,
     required this.game,
     required this.index,
     this.onTap,
+    required this.source,
   });
 
   @override
@@ -112,8 +115,10 @@ class _GameCardState extends State<GameCard> {
                           color: const Color(0xFF66C0F4).withValues(alpha: 0.9),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(
-                          Icons.play_arrow,
+                        child: Icon(
+                          widget.source == GameSource.available 
+                              ? Icons.download 
+                              : Icons.play_arrow,
                           color: Colors.white,
                           size: 32,
                         ),

@@ -477,6 +477,7 @@ class _GameTabContentState extends State<_GameTabContent> with AutomaticKeepAliv
               return GamesGrid(
                 games: games,
                 isDrawerOpen: widget.isDrawerOpen || !isActive,
+                source: widget.source,
               );
             },
           ),
