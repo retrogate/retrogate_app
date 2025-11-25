@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import '../../domain/models/game.dart';
 import '../../domain/models/game_images.dart';
+import '../../domain/models/game_source.dart';
 
 abstract class GamesState extends Equatable {
   const GamesState();
@@ -14,20 +15,37 @@ class GamesInitialState extends GamesState {
 }
 
 class GamesLoadingState extends GamesState {
-  const GamesLoadingState();
-}
+  final GameSource? source; // Which source is being loaded
 
-class GamesLoadedState extends GamesState {
-  final List<Game> games;
-
-  const GamesLoadedState(this.games);
+  const GamesLoadingState([this.source]);
 
   @override
-  List<Object?> get props => [games];
+  List<Object?> get props => [source];
 }
 
-class GamesEmptyState extends GamesState {
-  const GamesEmptyState();
+// New unified state that holds games for all sources
+class GamesDataState extends GamesState {
+  final Map<GameSource, List<Game>> gamesMap;
+  final GameSource? lastLoadedSource;
+
+  const GamesDataState(this.gamesMap, [this.lastLoadedSource]);
+
+  List<Game> getGames(GameSource source) => gamesMap[source] ?? [];
+  bool isEmpty(GameSource source) => getGames(source).isEmpty;
+  bool hasData(GameSource source) => gamesMap.containsKey(source);
+
+  @override
+  List<Object?> get props => [gamesMap, lastLoadedSource];
+
+  GamesDataState copyWith({
+    Map<GameSource, List<Game>>? gamesMap,
+    GameSource? lastLoadedSource,
+  }) {
+    return GamesDataState(
+      gamesMap ?? this.gamesMap,
+      lastLoadedSource ?? this.lastLoadedSource,
+    );
+  }
 }
 
 class GamesErrorState extends GamesState {

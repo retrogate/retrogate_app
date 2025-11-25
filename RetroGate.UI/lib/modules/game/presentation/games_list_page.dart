@@ -316,22 +316,36 @@ class _GameTabContentState extends State<_GameTabContent> with AutomaticKeepAliv
     
     return BlocBuilder<GamesBloc, GamesState>(
       builder: (context, state) {
+        // Handle loading state
         if (state is GamesLoadingState) {
-          return const Center(child: CircularProgressIndicator());
+          // Only show loading if it's for this tab's source
+          if (state.source == null || state.source == widget.source) {
+            return const Center(child: CircularProgressIndicator());
+          }
         }
 
+        // Handle error state
         if (state is GamesErrorState) {
           return _buildErrorView(context, state.message);
         }
 
-        if (state is GamesEmptyState) {
-          return _buildEmptyView();
+        // Handle data state
+        if (state is GamesDataState) {
+          final games = state.getGames(widget.source);
+          
+          if (!state.hasData(widget.source)) {
+            // Data not loaded yet for this source
+            return const Center(child: CircularProgressIndicator());
+          }
+          
+          if (games.isEmpty) {
+            return _buildEmptyView();
+          }
+          
+          return _buildGamesList(games);
         }
 
-        if (state is GamesLoadedState) {
-          return _buildGamesList(state.games);
-        }
-
+        // Initial state - show nothing or loading
         return const SizedBox.shrink();
       },
     );

@@ -138,7 +138,7 @@ class _AddGamePageState extends State<AddGamePage> {
             _gameJustCreated = true;
             // Reload games list
             _bloc.add(const LoadGamesEvent(GameSource.available));
-          } else if (state is GamesLoadedState && _gameJustCreated) {
+          } else if (state is GamesDataState && _gameJustCreated) {
             // Games reloaded after creation - now we can go back
             _gameJustCreated = false;
             ScaffoldMessenger.of(context).showSnackBar(

@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:retrogate_ui/modules/game/domain/models/game_source.dart';
+import '../../domain/models/game.dart';
 import '../../domain/usecases/get_all_games_usecase.dart';
 import '../../domain/usecases/create_game_usecase.dart';
 import '../../domain/usecases/get_game_images_usecase.dart';
@@ -23,13 +24,27 @@ class GamesBloc extends Bloc<GamesEvent, GamesState> {
   }
 
   Future<void> _onLoadGames(LoadGamesEvent event, Emitter<GamesState> emit) async {
-    emit(const GamesLoadingState());
-    await _fetchGames(event.source, emit);
+    // Get current data state or create new one
+    final currentData = state is GamesDataState 
+        ? (state as GamesDataState) 
+        : const GamesDataState({});
+    
+    // If we already have data for this source, don't reload
+    if (currentData.hasData(event.source)) {
+      return;
+    }
+    
+    emit(GamesLoadingState(event.source));
+    await _fetchGames(event.source, emit, currentData);
   }
 
   Future<void> _onRefreshGames(RefreshGamesEvent event, Emitter<GamesState> emit) async {
-    emit(const GamesLoadingState());
-    await _fetchGames(event.source, emit);
+    final currentData = state is GamesDataState 
+        ? (state as GamesDataState) 
+        : const GamesDataState({});
+    
+    emit(GamesLoadingState(event.source));
+    await _fetchGames(event.source, emit, currentData);
   }
 
   Future<void> _onCreateGame(CreateGameEvent event, Emitter<GamesState> emit) async {
@@ -64,7 +79,7 @@ class GamesBloc extends Bloc<GamesEvent, GamesState> {
     );
   }
 
-  Future<void> _fetchGames(GameSource source, Emitter<GamesState> emit) async {
+  Future<void> _fetchGames(GameSource source, Emitter<GamesState> emit, GamesDataState currentData) async {
     final result = await getAllGamesUseCase(source);
 
     result.fold(
@@ -72,11 +87,11 @@ class GamesBloc extends Bloc<GamesEvent, GamesState> {
         emit(GamesErrorState(error.toString()));
       },
       (games) {
-        if (games.isEmpty) {
-          emit(const GamesEmptyState());
-        } else {
-          emit(GamesLoadedState(games));
-        }
+        // Update the games map with new data for this source
+        final updatedMap = Map<GameSource, List<Game>>.from(currentData.gamesMap);
+        updatedMap[source] = games;
+        
+        emit(GamesDataState(updatedMap, source));
       },
     );
   }
