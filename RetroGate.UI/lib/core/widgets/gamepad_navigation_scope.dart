@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gamepads/gamepads.dart';
+import 'package:window_manager/window_manager.dart';
 
 /// Global gamepad navigation scope that manages gamepad input for the entire app
 class GamepadNavigationScope extends StatefulWidget {
@@ -189,7 +190,23 @@ class _GamepadNavigationScopeState extends State<GamepadNavigationScope> {
 
   @override
   Widget build(BuildContext context) {
-    return widget.child;
+    return Focus(
+      autofocus: true,
+      onKeyEvent: (node, event) {
+        // Handle F11 to toggle fullscreen
+        if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.f11) {
+          _toggleFullscreen();
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.ignored;
+      },
+      child: widget.child,
+    );
+  }
+  
+  Future<void> _toggleFullscreen() async {
+    final isFullScreen = await windowManager.isFullScreen();
+    await windowManager.setFullScreen(!isFullScreen);
   }
 }
 
