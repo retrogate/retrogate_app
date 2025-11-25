@@ -8,18 +8,33 @@ import "game/proto/v1/game_images_model.proto";
 
 option csharp_namespace = "RetroGate.Protos.Game.Proto.V1";
 
+enum GameSource {
+    GAME_SOURCE_AVAILABLE = 0;
+    GAME_SOURCE_INSTALLED = 1;
+}
+
 service GameService {
-	rpc Create(GameModel) returns (GameModel);
+	rpc Create(CreateGameRequest) returns (GameModel);
     rpc GetById(GetByIdRequest) returns (GameModel);
-    rpc GetAll(google.protobuf.Empty) returns (GetAllResponse);
+    rpc GetAll(GetAllRequest) returns (GetAllResponse);
     rpc FindByName(FindByNameRequest) returns (FindByNameResponse);
-    rpc Update(GameModel) returns (GameModel);
+    rpc Update(UpdateGameRequest) returns (GameModel);
     rpc Delete(GetByIdRequest) returns (google.protobuf.Empty);
     rpc GetImages(GetImagesRequest) returns (GameImagesModel);
 }
 
+message CreateGameRequest {
+    GameSource source = 1;
+    GameModel game = 2;
+}
+
 message GetByIdRequest {
-    string id = 1;
+    GameSource source = 1;
+    string id = 2;
+}
+
+message GetAllRequest {
+    GameSource source = 1;
 }
 
 message GetAllResponse {
@@ -27,11 +42,17 @@ message GetAllResponse {
 }
 
 message FindByNameRequest {
-    string name = 1;
+    GameSource source = 1;
+    string name = 2;
 }
 
 message FindByNameResponse {
     repeated GameModel games = 1;
+}
+
+message UpdateGameRequest {
+    GameSource source = 1;
+    GameModel game = 2;
 }
 
 message GetImagesRequest {
