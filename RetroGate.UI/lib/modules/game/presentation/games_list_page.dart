@@ -260,11 +260,15 @@ class _GamesListBody extends StatelessWidget {
                 source: GameSource.available,
                 isDrawerOpen: isDrawerOpen,
                 emptyMessage: 'No games available yet',
+                tabController: tabController,
+                tabIndex: 0,
               ),
               _GameTabContent(
                 source: GameSource.installed,
                 isDrawerOpen: isDrawerOpen,
                 emptyMessage: 'No installed games yet',
+                tabController: tabController,
+                tabIndex: 1,
               ),
             ],
           ),
@@ -278,11 +282,15 @@ class _GameTabContent extends StatefulWidget {
   final GameSource source;
   final bool isDrawerOpen;
   final String emptyMessage;
+  final TabController tabController;
+  final int tabIndex;
 
   const _GameTabContent({
     required this.source,
     this.isDrawerOpen = false,
     required this.emptyMessage,
+    required this.tabController,
+    required this.tabIndex,
   });
 
   @override
@@ -447,7 +455,17 @@ class _GameTabContentState extends State<_GameTabContent> with AutomaticKeepAliv
         ),
         // Games Grid
         Expanded(
-          child: GamesGrid(games: games, isDrawerOpen: widget.isDrawerOpen),
+          child: AnimatedBuilder(
+            animation: widget.tabController,
+            builder: (context, child) {
+              // Only enable gamepad navigation when this tab is active
+              final isActive = widget.tabController.index == widget.tabIndex;
+              return GamesGrid(
+                games: games,
+                isDrawerOpen: widget.isDrawerOpen || !isActive,
+              );
+            },
+          ),
         ),
       ],
     );
