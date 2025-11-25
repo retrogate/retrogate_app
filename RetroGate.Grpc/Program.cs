@@ -54,6 +54,7 @@ builder.Services.AddSingleton<IFindGameByName, FindGameByName>();
 builder.Services.AddSingleton<IGetAllGames, GetAllGames>();
 builder.Services.AddSingleton<IGetGameById, GetGameById>();
 builder.Services.AddSingleton<IUpdateGame, UpdateGame>();
+builder.Services.AddSingleton<IFindInstalledGames, FindInstalledGames>();
 builder.Services.AddSingleton<RetroGate.SDK.Game.Domain.Usecases.IDeleteGame, RetroGate.SDK.Game.Infra.Usecases.DeleteGame>();
 builder.Services.AddSingleton<IGetGameImages, GetGameImages>();
 

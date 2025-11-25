@@ -27,13 +27,12 @@ namespace RetroGate.SDK.Installer.Infra.Repository
         public InstallerRepository(
             IGetGameById getGameById,
             ICreateShortcut createShortcut,
-            ConfigModel config,
-            string? installBasePath = null)
+            ConfigModel config)
         {
             _getGameById = getGameById;
             _createShortcut = createShortcut;
             _httpClient = new HttpClient();
-            _installBasePath = installBasePath ?? Path.Combine(
+            _installBasePath = config.InstalledGamesPath ?? Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                 "RetroGate",
                 "Games");

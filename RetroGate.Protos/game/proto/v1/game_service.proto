@@ -21,6 +21,7 @@ service GameService {
     rpc Update(UpdateGameRequest) returns (GameModel);
     rpc Delete(GetByIdRequest) returns (google.protobuf.Empty);
     rpc GetImages(GetImagesRequest) returns (GameImagesModel);
+    rpc FindInstalledGames(google.protobuf.Empty) returns (GetAllResponse);
 }
 
 message CreateGameRequest {
