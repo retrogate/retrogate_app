@@ -1,5 +1,4 @@
 using LanguageExt;
-using LanguageExt.Pretty;
 using RetroGate.SDK.Core.Domain.Models;
 using RetroGate.SDK.Core.Domain.Repository;
 using RetroGate.SDK.Core.Errors;
@@ -40,7 +39,11 @@ namespace RetroGate.SDK.Core.Infra
                 {
                     SteamPath = _deafultSteamPath,
                     SteamUserId = GetSteamUserId(),
-                    SteamGridDbApiKey = string.Empty
+                    SteamGridDbApiKey = string.Empty,
+                    InstalledGamesPath = Path.Combine(
+                        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                        "RetroGate",
+                        "Games")
                 };
             }
             var json = File.ReadAllText(_configFileName);

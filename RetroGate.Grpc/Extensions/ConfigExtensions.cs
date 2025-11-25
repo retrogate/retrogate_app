@@ -12,6 +12,7 @@ namespace RetroGate.Grpc.Extensions
                 SteamPath = configModel.SteamPath,
                 SteamUserId = configModel.SteamUserId,
                 SteamGridDbApiKey = configModel.SteamGridDbApiKey,
+                InstalledGamesPath = configModel.InstalledGamesPath
             };
         }
 
@@ -22,6 +23,7 @@ namespace RetroGate.Grpc.Extensions
                 SteamPath = configModel.SteamPath,
                 SteamUserId = configModel.SteamUserId,
                 SteamGridDbApiKey = configModel.SteamGridDbApiKey,
+                InstalledGamesPath = configModel.InstalledGamesPath
             };
         }
     }
