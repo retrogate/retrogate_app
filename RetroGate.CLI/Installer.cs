@@ -75,8 +75,8 @@ namespace RetroGate.CLI
                 // Inicializa os repositórios e use cases
                 var imagesRepository = new GameImagesRepository(config);
                 var getImages = new GetGameImages(imagesRepository);
-                var gameRepository = new GameRepository(getImages);
-                var getGameByIdUseCase = new GetGameById(gameRepository);
+                var gameRepository = new AvailableGamesRepository(getImages);
+                var getGameByIdUseCase = new GetGameById<AvailableGamesRepository>(gameRepository);
 
                 var configRepository = new ConfigRepository();
                 var shortcutRepository = new ShortcutRepository(config);
@@ -149,8 +149,8 @@ namespace RetroGate.CLI
                 // Inicializa os repositórios e use cases
                 var imagesRepository = new GameImagesRepository(config);
                 var getImages = new GetGameImages(imagesRepository);
-                var gameRepository = new GameRepository(getImages);
-                var getGameByIdUseCase = new GetGameById(gameRepository);
+                var gameRepository = new AvailableGamesRepository(getImages);
+                var getGameByIdUseCase = new GetGameById<AvailableGamesRepository>(gameRepository);
 
                 var shortcutRepository = new ShortcutRepository(config);
                 var createShortcutUseCase = new CreateShortcut(shortcutRepository);
