@@ -1,9 +1,11 @@
 import 'package:dartz/dartz.dart';
+import 'package:retrogate_ui/modules/game/domain/models/game_source.dart';
 import '../../domain/models/game.dart';
 import '../../domain/models/game_images.dart';
 import '../../domain/repositories/game_repository.dart';
 import '../datasources/game_grpc_datasource.dart';
 import '../../../../generated/game/proto/v1/game_model.pb.dart' as proto;
+import '../../../../generated/game/proto/v1/game_service.pb.dart' as proto;
 
 class GameRepository implements IGameRepository {
   final GameGrpcDataSource dataSource;
@@ -11,9 +13,9 @@ class GameRepository implements IGameRepository {
   GameRepository(this.dataSource);
 
   @override
-  Future<Either<Exception, List<Game>>> getAll() async {
+  Future<Either<Exception, List<Game>>> getAll(GameSource source) async {
     try {
-      final protoGames = await dataSource.getAll();
+      final protoGames = await dataSource.getAll(_gameSource(source));
       final games = protoGames.map((proto) => Game.fromProto(proto)).toList();
       return Right(games);
     } catch (e) {
@@ -22,9 +24,9 @@ class GameRepository implements IGameRepository {
   }
 
   @override
-  Future<Either<Exception, Game>> getById(String id) async {
+  Future<Either<Exception, Game>> getById(GameSource source, String id) async {
     try {
-      final protoGame = await dataSource.getById(id);
+      final protoGame = await dataSource.getById(_gameSource(source), id);
       final game = Game.fromProto(protoGame);
       return Right(game);
     } catch (e) {
@@ -33,9 +35,9 @@ class GameRepository implements IGameRepository {
   }
 
   @override
-  Future<Either<Exception, List<Game>>> findByName(String name) async {
+  Future<Either<Exception, List<Game>>> findByName(GameSource source, String name) async {
     try {
-      final protoGames = await dataSource.findByName(name);
+      final protoGames = await dataSource.findByName(_gameSource(source), name);
       final games = protoGames.map((proto) => Game.fromProto(proto)).toList();
       return Right(games);
     } catch (e) {
@@ -55,10 +57,10 @@ class GameRepository implements IGameRepository {
   }
 
   @override
-  Future<Either<Exception, Game>> create(Game game) async {
+  Future<Either<Exception, Game>> create(GameSource source, Game game) async {
     try {
       final protoGame = _toProto(game);
-      final createdProto = await dataSource.create(protoGame);
+      final createdProto = await dataSource.create(_gameSource(source), protoGame);
       final createdGame = Game.fromProto(createdProto);
       return Right(createdGame);
     } catch (e) {
@@ -67,10 +69,10 @@ class GameRepository implements IGameRepository {
   }
 
   @override
-  Future<Either<Exception, Game>> update(Game game) async {
+  Future<Either<Exception, Game>> update(GameSource source, Game game) async {
     try {
       final protoGame = _toProto(game);
-      final updatedProto = await dataSource.update(protoGame);
+      final updatedProto = await dataSource.update(_gameSource(source), protoGame);
       final updatedGame = Game.fromProto(updatedProto);
       return Right(updatedGame);
     } catch (e) {
@@ -79,9 +81,9 @@ class GameRepository implements IGameRepository {
   }
 
   @override
-  Future<Either<Exception, void>> delete(String id) async {
+  Future<Either<Exception, void>> delete(GameSource source, String id) async {
     try {
-      await dataSource.delete(id);
+      await dataSource.delete(_gameSource(source), id);
       return const Right(null);
     } catch (e) {
       return Left(Exception(e.toString()));
@@ -98,5 +100,9 @@ class GameRepository implements IGameRepository {
       ..imagePosterUrl = game.imagePosterUrl
       ..imageLogoUrl = game.imageLogoUrl
       ..installationMethod = proto.GameInstallationMethod.values[game.installationMethod.index];
+  }
+
+  proto.GameSource _gameSource(GameSource source) {
+    return proto.GameSource.values[source.index];
   }
 }

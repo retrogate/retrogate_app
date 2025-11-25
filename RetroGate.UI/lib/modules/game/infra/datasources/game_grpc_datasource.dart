@@ -21,27 +21,32 @@ class GameGrpcDataSource {
     _client = GameServiceClient(channel);
   }
 
-  Future<List<GameModel>> getAll() async {
+  Future<List<GameModel>> getAll(GameSource source) async {
     try {
-      final response = await _client.getAll(Empty());
+      var request = GetAllRequest(source: source);
+      final response = await _client.getAll(request);
       return response.games;
     } catch (e) {
       throw Exception('Failed to get games: $e');
     }
   }
 
-  Future<GameModel> getById(String id) async {
+  Future<GameModel> getById(GameSource source, String id) async {
     try {
-      final request = GetByIdRequest()..id = id;
+      final request = GetByIdRequest()
+        ..source = source
+        ..id = id;
       return await _client.getById(request);
     } catch (e) {
       throw Exception('Failed to get game by id: $e');
     }
   }
 
-  Future<List<GameModel>> findByName(String name) async {
+  Future<List<GameModel>> findByName(GameSource source, String name) async {
     try {
-      final request = FindByNameRequest()..name = name;
+      final request = FindByNameRequest()
+        ..source = source
+        ..name = name;
       final response = await _client.findByName(request);
       return response.games;
     } catch (e) {
@@ -58,25 +63,33 @@ class GameGrpcDataSource {
     }
   }
 
-  Future<GameModel> create(GameModel game) async {
+  Future<GameModel> create(GameSource source, GameModel game) async {
     try {
-      return await _client.create(game);
+      final request = CreateGameRequest()
+        ..source = source
+        ..game = game;
+      return await _client.create(request);
     } catch (e) {
       throw Exception('Failed to create game: $e');
     }
   }
 
-  Future<GameModel> update(GameModel game) async {
+  Future<GameModel> update(GameSource source, GameModel game) async {
     try {
-      return await _client.update(game);
+      final request = UpdateGameRequest()
+        ..source = source
+        ..game = game;
+      return await _client.update(request);
     } catch (e) {
       throw Exception('Failed to update game: $e');
     }
   }
 
-  Future<void> delete(String id) async {
+  Future<void> delete(GameSource source, String id) async {
     try {
-      final request = GetByIdRequest()..id = id;
+      final request = GetByIdRequest()
+        ..source = source
+        ..id = id;
       await _client.delete(request);
     } catch (e) {
       throw Exception('Failed to delete game: $e');

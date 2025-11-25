@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:retrogate_ui/modules/game/domain/models/game_source.dart';
 import '../../domain/usecases/get_all_games_usecase.dart';
 import '../../domain/usecases/create_game_usecase.dart';
 import '../../domain/usecases/get_game_images_usecase.dart';
@@ -34,7 +35,7 @@ class GamesBloc extends Bloc<GamesEvent, GamesState> {
   Future<void> _onCreateGame(CreateGameEvent event, Emitter<GamesState> emit) async {
     emit(const GameCreatingState());
 
-    final result = await createGameUseCase(event.game);
+    final result = await createGameUseCase(GameSource.available, event.game);
 
     result.fold(
       (error) {
@@ -64,7 +65,7 @@ class GamesBloc extends Bloc<GamesEvent, GamesState> {
   }
 
   Future<void> _fetchGames(Emitter<GamesState> emit) async {
-    final result = await getAllGamesUseCase();
+    final result = await getAllGamesUseCase(GameSource.available);
 
     result.fold(
       (error) {
