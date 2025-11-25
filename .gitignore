@@ -433,3 +433,4 @@ appsettings.Development.json
 # Games/
 # **/RetroGate/Games/
 RetroGate.Grpc/retrogate_config.json
+RetroGate.Grpc/installed_games.json
