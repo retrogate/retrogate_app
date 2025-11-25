@@ -49,6 +49,12 @@ dependencies:
   # Gamepad/Joystick Support
   gamepads: ^0.1.9
   
+  # Window Management (Desktop)
+  window_manager: ^0.4.3
+  
+  # Local Storage
+  shared_preferences: ^2.3.3
+  
   # Utilities
   dartz: ^0.10.1
 
