@@ -6,11 +6,20 @@ using RetroGate.SDK.Game.Domain.Usecases;
 
 namespace RetroGate.SDK.Game.Infra.Usecases
 {
-    public class GetAllGames(IGameRepository repository) : IGetAllGames
+    public class GetAllGames(IAvailableGamesRepository availableGamesRepository,
+                            IInstalledGamesRepository installedGamesRepository) : IGetAllGames
     {
-        public Task<Either<ErrorBase, List<GameModel>>> Call()
+        public Task<Either<ErrorBase, List<GameModel>>> Call(GameSource source)
         {
-            return repository.GetAll();
+            switch (source)
+            {
+                case GameSource.AvailableGames:
+                    return availableGamesRepository.GetAll();
+                case GameSource.InstalledGames:
+                    return installedGamesRepository.GetAll();
+                default:
+                    return Task.FromResult<Either<ErrorBase, List<GameModel>>>(new ErrorInvalidArgument("Invalid game source."));
+            }
         }
     }
 }

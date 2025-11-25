@@ -51,7 +51,7 @@ namespace RetroGate.SDK.Installer.Infra.Repository
                 Console.WriteLine($"[Installer] Iniciando instalação do jogo: {gameId} (replace: {replace})");
 
                 // Busca o jogo pelo ID
-                var gameResult = await _getGameById.Call(gameId);
+                var gameResult = await _getGameById.Call(GameSource.AvailableGames, gameId);
                 if (gameResult.IsLeft)
                 {
                     Console.WriteLine($"[Installer] Erro: Jogo não encontrado - {gameId}");

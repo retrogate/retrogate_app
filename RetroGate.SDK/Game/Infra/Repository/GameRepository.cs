@@ -7,10 +7,8 @@ using RetroGate.SDK.Shortcut.Infra.Repository;
 
 namespace RetroGate.SDK.Game.Infra.Repository
 {
-    public class GameRepository(IGetGameImages getGameImages) : IGameRepository
+    public class GameRepository(IGetGameImages getGameImages, string fileName) : IGameRepository
     {
-        private const string fileName = "games.json";
-
         public async Task<Either<ErrorBase, GameModel>> Create(GameModel game)
         {
             if((game.ImageHeroUrl == null || game.ImageHeroUrl == "") && 
@@ -124,13 +122,13 @@ namespace RetroGate.SDK.Game.Infra.Repository
             );
         }
 
-        private static void SaveToFile(List<GameModel> games)
+        private void SaveToFile(List<GameModel> games)
         {
             var json = System.Text.Json.JsonSerializer.Serialize(games);
             File.WriteAllText(fileName, json);
         }
 
-        private static List<GameModel> LoadFromFile()
+        private List<GameModel> LoadFromFile()
         {
             if (!File.Exists(fileName))
             {

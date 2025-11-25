@@ -1,6 +1,7 @@
 ﻿using LanguageExt;
 using RetroGate.SDK.Core.Errors;
 using RetroGate.SDK.Installer.Domain.Models;
+
 namespace RetroGate.SDK.Installer.Domain.Repository
 {
     public interface IInstallerRepository

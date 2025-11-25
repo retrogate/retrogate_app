@@ -6,6 +6,6 @@ namespace RetroGate.SDK.Game.Domain.Usecases
 {
     public interface IFindGameByName
     {
-        Task<Either<ErrorBase, List<GameModel>>> Call(string name);
+        Task<Either<ErrorBase, List<GameModel>>> Call(GameSource source, string name);
     }
 }
