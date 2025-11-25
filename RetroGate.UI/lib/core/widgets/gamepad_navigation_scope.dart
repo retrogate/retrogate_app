@@ -108,50 +108,55 @@ class _GamepadNavigationScopeState extends State<GamepadNavigationScope> {
   void _handleButtonInput(GamepadEvent event) {
     if (event.value < 0.5) return;
 
-    switch (event.key) {
-      // Menu button (Xbox button / PS button / Start)
-      case 'button_select':
-      case 'button_start':
-      case 'button_mode':
-      case '7': // Start button
-      case 'button-7':
-        _onMenuButtonPressed?.call();
-        break;
+    try {
+      switch (event.key) {
+        // Menu button (Xbox button / PS button / Start)
+        case 'button_select':
+        case 'button_start':
+        case 'button_mode':
+        case '7': // Start button
+        case 'button-7':
+          _onMenuButtonPressed?.call();
+          break;
 
-      // Back button (B / Circle / Escape)
-      case 'button_b':
-      case 'button_circle':
-      case '1':
-      case 'button-1':
-        _onBackButtonPressed?.call();
-        break;
+        // Back button (B / Circle / Escape)
+        case 'button_b':
+        case 'button_circle':
+        case '1':
+        case 'button-1':
+          _onBackButtonPressed?.call();
+          break;
 
-      // A button will be handled by focused widgets
-      case 'button_a':
-      case 'button_cross':
-      case '0':
-      case 'button-0':
-        // Trigger activation on currently focused widget
-        if(event.value == 1.0) {
-          _activateFocusedWidget();
-        }
-        break;
-      
-      // Left bumper (L1/LB)
-      case 'button_l1':
-      case 'button_lb':
-      case '4':
-      case 'button-4':
-        _onLeftBumperPressed?.call();
-        break;
-      
-      // Right bumper (R1/RB)
-      case 'button_r1':
-      case 'button_rb':
-      case '5':
-      case 'button-5':
-        _onRightBumperPressed?.call();
-        break;
+        // A button will be handled by focused widgets
+        case 'button_a':
+        case 'button_cross':
+        case '0':
+        case 'button-0':
+          // Trigger activation on currently focused widget
+          if(event.value == 1.0) {
+            _activateFocusedWidget();
+          }
+          break;
+        
+        // Left bumper (L1/LB)
+        case 'button_l1':
+        case 'button_lb':
+        case '4':
+        case 'button-4':
+          _onLeftBumperPressed?.call();
+          break;
+        
+        // Right bumper (R1/RB)
+        case 'button_r1':
+        case 'button_rb':
+        case '5':
+        case 'button-5':
+          _onRightBumperPressed?.call();
+          break;
+      }
+    } catch (e) {
+      // Silently handle button errors
+      debugPrint('Gamepad button error: $e');
     }
   }
 
@@ -177,15 +182,40 @@ class _GamepadNavigationScopeState extends State<GamepadNavigationScope> {
   }
 
   void _moveFocus(TraversalDirection direction) {
-    final FocusNode? currentFocus = FocusManager.instance.primaryFocus;
-    if (currentFocus != null) {
-      currentFocus.focusInDirection(direction);
+    try {
+      final FocusNode? currentFocus = FocusManager.instance.primaryFocus;
+      if (currentFocus == null || currentFocus.context == null) {
+        return;
+      }
+      
+      // Check if the widget is still mounted and has a valid context
+      if (!currentFocus.context!.mounted) {
+        return;
+      }
+      
+      // Only try to move focus if there's a valid enclosing scope
+      final FocusScopeNode? scope = currentFocus.enclosingScope;
+      if (scope != null && scope.context != null) {
+        currentFocus.focusInDirection(direction);
+      }
+    } catch (e) {
+      // Silently handle navigation errors to prevent crashes
+      debugPrint('Gamepad navigation error: $e');
     }
   }
 
   void _activateFocusedWidget() {
-    final FocusNode? currentFocus = FocusManager.instance.primaryFocus;
-    if (currentFocus != null && currentFocus.context != null) {
+    try {
+      final FocusNode? currentFocus = FocusManager.instance.primaryFocus;
+      if (currentFocus == null || currentFocus.context == null) {
+        return;
+      }
+      
+      // Check if the widget is still mounted
+      if (!currentFocus.context!.mounted) {
+        return;
+      }
+      
       // Try to activate the widget using onKey callback
       final result = currentFocus.onKeyEvent?.call(
         currentFocus,
@@ -203,6 +233,9 @@ class _GamepadNavigationScopeState extends State<GamepadNavigationScope> {
           // Widget will handle activation through its own onTap/onPressed
         }
       }
+    } catch (e) {
+      // Silently handle activation errors
+      debugPrint('Widget activation error: $e');
     }
   }
 

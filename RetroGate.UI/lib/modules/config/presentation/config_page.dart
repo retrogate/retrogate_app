@@ -46,6 +46,14 @@ class _ConfigPageState extends State<ConfigPage> with SingleTickerProviderStateM
     // When tab changes, unfocus current widget to allow navigation in new tab
     if (mounted && _tabController.indexIsChanging) {
       FocusManager.instance.primaryFocus?.unfocus();
+      
+      // Wait for tab animation to complete, then focus first focusable widget
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          // Move focus to first focusable widget in the new tab
+          FocusScope.of(context).nextFocus();
+        }
+      });
     }
   }
   
