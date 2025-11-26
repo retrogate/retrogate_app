@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 import '../../domain/models/game.dart';
 import '../../domain/models/game_source.dart';
+import '../../../installer/presentation/bloc/installer_bloc.dart';
+import '../../../installer/presentation/bloc/installer_state.dart';
 import 'game_card.dart';
 import 'gamepad_navigation_wrapper.dart';
 
@@ -86,14 +90,25 @@ class _GamesGridState extends State<GamesGrid> {
             itemCount: widget.games.length,
             itemBuilder: (context, index) {
               final game = widget.games[index];
-              return GameCard(
-                game: game,
-                index: index,
-                source: widget.source,
-                onTap: () {
-                  if (widget.onGameSelected != null) {
-                    widget.onGameSelected!(game, index);
-                  }
+              
+              return BlocBuilder<InstallerBloc, InstallerState>(
+                bloc: Modular.get<InstallerBloc>(),
+                builder: (context, installerState) {
+                  final progress = installerState is InstallerDataState
+                      ? installerState.getProgress(game.id)
+                      : null;
+                  
+                  return GameCard(
+                    game: game,
+                    index: index,
+                    source: widget.source,
+                    installProgress: progress,
+                    onTap: () {
+                      if (widget.onGameSelected != null) {
+                        widget.onGameSelected!(game, index);
+                      }
+                    },
+                  );
                 },
               );
             },
