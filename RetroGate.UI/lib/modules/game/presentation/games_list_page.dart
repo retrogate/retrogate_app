@@ -529,10 +529,9 @@ class _GameTabContentState extends State<_GameTabContent> with AutomaticKeepAliv
       builder: (context) => GameContextMenu(
         game: game,
         onClose: () {
-          Navigator.of(context).pop();
-          setState(() {
-            _isContextMenuOpen = false;
-          });
+          if (Navigator.of(context).canPop()) {
+            Navigator.of(context).pop();
+          }
         },
         onActionSelected: (action) {
           // Por enquanto apenas mostra qual ação foi selecionada

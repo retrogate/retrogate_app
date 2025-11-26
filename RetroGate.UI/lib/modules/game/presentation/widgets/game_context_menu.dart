@@ -1,4 +1,7 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:gamepads/gamepads.dart';
 import '../../domain/models/game.dart';
 
 enum GameContextMenuAction {
@@ -43,11 +46,82 @@ class GameContextMenu extends StatefulWidget {
 class _GameContextMenuState extends State<GameContextMenu> {
   int _selectedIndex = 0;
   late List<_MenuOption> _options;
+  StreamSubscription<GamepadEvent>? _gamepadSubscription;
 
   @override
   void initState() {
     super.initState();
     _buildOptions();
+    _initGamepad();
+  }
+
+  @override
+  void dispose() {
+    _gamepadSubscription?.cancel();
+    super.dispose();
+  }
+
+  void _initGamepad() {
+    _gamepadSubscription = Gamepads.events.listen((event) {
+      if (!mounted) return;
+
+      if (event.type == KeyType.button) {
+        _handleButtonInput(event);
+      } else if (event.type == KeyType.analog) {
+        _handleAnalogInput(event);
+      }
+    });
+  }
+
+  void _handleButtonInput(GamepadEvent event) {
+    if (event.value < 0.5) return;
+
+    switch (event.key) {
+      case 'button_a':
+      case 'button_cross':
+      case '0':
+      case 'button-0':
+        _selectCurrentItem();
+        break;
+      case 'button_b':
+      case 'button_circle':
+      case '1':
+      case 'button-1':
+      case 'button_select':
+      case 'button_back':
+      case 'button_share':
+      case '8':
+      case 'button-8':
+        widget.onClose();
+        break;
+    }
+  }
+
+  void _handleAnalogInput(GamepadEvent event) {
+    if (event.key == 'pov') {
+      if (event.value == 65535.0) return; // Neutral
+
+      if (event.value >= 0.0 && event.value < 4500.0) {
+        // Up
+        _moveSelection(-1);
+      } else if (event.value >= 13500.0 && event.value < 22500.0) {
+        // Down
+        _moveSelection(1);
+      }
+    }
+  }
+
+  void _moveSelection(int delta) {
+    setState(() {
+      _selectedIndex = (_selectedIndex + delta).clamp(0, _options.length - 1);
+    });
+  }
+
+  void _selectCurrentItem() {
+    if (!mounted) return;
+    final option = _options[_selectedIndex];
+    widget.onActionSelected(option.action);
+    widget.onClose();
   }
 
   void _buildOptions() {
@@ -93,14 +167,36 @@ class _GameContextMenuState extends State<GameContextMenu> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: widget.onClose,
-      child: Container(
-        color: Colors.black.withValues(alpha: 0.7),
-        child: Center(
-          child: GestureDetector(
-            onTap: () {}, // Prevent tap from closing when clicking on menu
-            child: Container(
+    return Focus(
+      autofocus: true,
+      onKeyEvent: (node, event) {
+        if (event is KeyDownEvent) {
+          switch (event.logicalKey) {
+            case LogicalKeyboardKey.arrowUp:
+              _moveSelection(-1);
+              return KeyEventResult.handled;
+            case LogicalKeyboardKey.arrowDown:
+              _moveSelection(1);
+              return KeyEventResult.handled;
+            case LogicalKeyboardKey.enter:
+            case LogicalKeyboardKey.space:
+              _selectCurrentItem();
+              return KeyEventResult.handled;
+            case LogicalKeyboardKey.escape:
+              widget.onClose();
+              return KeyEventResult.handled;
+          }
+        }
+        return KeyEventResult.ignored;
+      },
+      child: GestureDetector(
+        onTap: widget.onClose,
+        child: Container(
+          color: Colors.black.withValues(alpha: 0.7),
+          child: Center(
+            child: GestureDetector(
+              onTap: () {}, // Prevent tap from closing when clicking on menu
+              child: Container(
               width: 400,
               decoration: BoxDecoration(
                 color: const Color(0xFF1B2838),
@@ -166,8 +262,10 @@ class _GameContextMenuState extends State<GameContextMenu> {
                         option: option,
                         isSelected: isSelected,
                         onTap: () {
-                          widget.onActionSelected(option.action);
-                          widget.onClose();
+                          setState(() {
+                            _selectedIndex = index;
+                          });
+                          _selectCurrentItem();
                         },
                       );
                     },
@@ -197,7 +295,7 @@ class _GameContextMenuState extends State<GameContextMenu> {
           ),
         ),
       ),
-    );
+    ));
   }
 
   Widget _buildMenuItem({
