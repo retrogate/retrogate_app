@@ -6,6 +6,7 @@ import '../../../core/widgets/gamepad_navigation_scope.dart';
 import '../../../core/widgets/app_drawer.dart';
 import '../../installer/presentation/bloc/installer_bloc.dart';
 import '../../installer/presentation/bloc/installer_event.dart';
+import '../../installer/presentation/bloc/installer_state.dart';
 import '../domain/models/game.dart';
 import '../domain/models/game_source.dart';
 import 'bloc/games_bloc.dart';
@@ -523,11 +524,19 @@ class _GameTabContentState extends State<_GameTabContent> with AutomaticKeepAliv
       _isContextMenuOpen = true;
     });
 
+    // Pegar o progresso de instalação atual
+    final installerBloc = Modular.get<InstallerBloc>();
+    final installerState = installerBloc.state;
+    final installProgress = installerState is InstallerDataState
+        ? installerState.getProgress(game.id)
+        : null;
+
     showDialog(
       context: context,
       barrierDismissible: true,
       builder: (context) => GameContextMenu(
         game: game,
+        installProgress: installProgress,
         onClose: () {
           if (Navigator.of(context).canPop()) {
             Navigator.of(context).pop();

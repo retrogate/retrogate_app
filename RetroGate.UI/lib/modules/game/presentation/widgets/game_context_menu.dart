@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gamepads/gamepads.dart';
 import '../../domain/models/game.dart';
+import '../../../installer/domain/models/installer_progress.dart';
 
 enum GameContextMenuAction {
   install,
+  cancelInstallation,
   edit,
   hide,
   play,
@@ -31,12 +33,14 @@ class GameContextMenu extends StatefulWidget {
   final Game game;
   final VoidCallback onClose;
   final Function(GameContextMenuAction) onActionSelected;
+  final InstallerProgress? installProgress;
 
   const GameContextMenu({
     super.key,
     required this.game,
     required this.onClose,
     required this.onActionSelected,
+    this.installProgress,
   });
 
   @override
@@ -125,6 +129,8 @@ class _GameContextMenuState extends State<GameContextMenu> {
   }
 
   void _buildOptions() {
+    final isInstalling = widget.installProgress != null && widget.installProgress!.isInProgress;
+    
     if (widget.game.isInstalled) {
       _options = [
         _MenuOption(
@@ -144,7 +150,28 @@ class _GameContextMenuState extends State<GameContextMenu> {
           isDestructive: true,
         ),
       ];
+    } else if (isInstalling) {
+      // Quando está instalando, mostrar apenas opção de cancelar
+      _options = [
+        _MenuOption(
+          icon: Icons.cancel,
+          label: 'Cancel Installation',
+          action: GameContextMenuAction.cancelInstallation,
+          isDestructive: true,
+        ),
+        _MenuOption(
+          icon: Icons.edit,
+          label: 'Edit',
+          action: GameContextMenuAction.edit,
+        ),
+        _MenuOption(
+          icon: Icons.visibility_off,
+          label: 'Hide',
+          action: GameContextMenuAction.hide,
+        ),
+      ];
     } else {
+      // Jogo disponível para instalar
       _options = [
         _MenuOption(
           icon: Icons.download,
