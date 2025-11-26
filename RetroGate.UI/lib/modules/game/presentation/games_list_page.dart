@@ -4,6 +4,8 @@ import 'package:flutter_modular/flutter_modular.dart';
 import '../../../core/widgets/gamepad_focusable.dart';
 import '../../../core/widgets/gamepad_navigation_scope.dart';
 import '../../../core/widgets/app_drawer.dart';
+import '../../installer/presentation/bloc/installer_bloc.dart';
+import '../../installer/presentation/bloc/installer_event.dart';
 import '../domain/models/game.dart';
 import '../domain/models/game_source.dart';
 import 'bloc/games_bloc.dart';
@@ -478,11 +480,38 @@ class _GameTabContentState extends State<_GameTabContent> with AutomaticKeepAliv
                 games: games,
                 isDrawerOpen: widget.isDrawerOpen || !isActive,
                 source: widget.source,
+                onGameSelected: _handleGameSelected,
               );
             },
           ),
         ),
       ],
     );
+  }
+
+  void _handleGameSelected(Game game, GameSource source, int index) {
+    if (source == GameSource.available) {
+      // Start installation for available games
+      final installerBloc = Modular.get<InstallerBloc>();
+      installerBloc.add(InstallGameEvent(game.id));
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Starting installation of ${game.name}...'),
+          backgroundColor: const Color(0xFF66C0F4),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    } else {
+      // Launch game for installed games
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Launching ${game.name}...'),
+          backgroundColor: const Color(0xFF66C0F4),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+      // TODO: Implement game launch
+    }
   }
 }
