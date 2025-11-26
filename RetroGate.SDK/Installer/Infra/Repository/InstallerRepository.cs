@@ -110,11 +110,12 @@ namespace RetroGate.SDK.Installer.Infra.Repository
                     // Reporta progresso: Adicionando à biblioteca
                     ReportProgress(gameId, InstallerProgressState.CreatingShortcut, 90, 0);
 
+                    // Adiciona o jogo a biblioteca
+                    await CreateGame(game);
+
                     // Adiciona shortcut no Steam
                     await AddShortcutToSteam(game, finalInstallPath, restartSteam);
                     Console.WriteLine($"[Installer] Shortcut adicionado ao Steam");
-
-                    await CreateGame(game);
 
                     // Limpa o arquivo de download
                     if (File.Exists(downloadPath))
