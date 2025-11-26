@@ -121,10 +121,52 @@ class _GameCardState extends State<GameCard> {
                   // Installation progress overlay
                   if (widget.installProgress != null && widget.installProgress!.isInProgress)
                     _buildProgressOverlay(),
+                  // Installation status badge (subtle, always visible)
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: widget.game.isInstalled
+                            ? const Color(0xFF5C7E10).withValues(alpha: 0.9) // Green
+                            : const Color(0xFF2A475E).withValues(alpha: 0.9), // Gray-blue
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(
+                          color: widget.game.isInstalled
+                              ? const Color(0xFF7BA428)
+                              : const Color(0xFF66C0F4).withValues(alpha: 0.5),
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            widget.game.isInstalled
+                                ? Icons.check_circle
+                                : Icons.cloud_download_outlined,
+                            color: Colors.white,
+                            size: 14,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            widget.game.isInstalled ? 'Installed' : 'Available',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  // Gamepad selection indicator (overlays status badge when selected)
                   if (isSelected)
                     Positioned(
                       top: 8,
-                      right: 8,
+                      left: 8,
                       child: Container(
                         padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(

@@ -29,6 +29,7 @@ class Game {
     required this.installationMethod,
     required this.source,
     this.settingsFile,
+    this.isInstalled = false,
   });
 
   factory Game.fromProto(dynamic proto, GameSource source) {
@@ -42,6 +43,7 @@ class Game {
       imageLogoUrl: proto.imageLogoUrl,
       installationMethod: GameInstallationMethod.values[proto.installationMethod.value],
       source: source,
+      isInstalled: source == GameSource.installed,
       settingsFile: proto.hasSettingsFile() ? proto.settingsFile : null,
     );
   }
