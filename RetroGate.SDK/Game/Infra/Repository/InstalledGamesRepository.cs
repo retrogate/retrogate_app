@@ -52,11 +52,35 @@ namespace RetroGate.SDK.Game.Infra.Repository
                     var process = new System.Diagnostics.Process();
                     process.StartInfo.FileName = executableFullPath;
                     process.StartInfo.WorkingDirectory = new FileInfo(executableFullPath).DirectoryName!;
+                    process.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Maximized;
+                    process.StartInfo.UseShellExecute = true;
+                    
                     process.Start();
+                    
+                    // Aguarda um pouco para a janela ser criada
+                    System.Threading.Thread.Sleep(500);
+                    
+                    // Traz a janela para frente
+                    if (!process.HasExited && process.MainWindowHandle != IntPtr.Zero)
+                    {
+                        SetForegroundWindow(process.MainWindowHandle);
+                        ShowWindow(process.MainWindowHandle, SW_RESTORE);
+                        SetForegroundWindow(process.MainWindowHandle);
+                    }
+                    
                     return Task.FromResult<Either<ErrorBase, Unit>>(Unit.Default);
                 },
                 Left: err => Task.FromResult<Either<ErrorBase, Unit>>(err)
             );
         }
+
+        // P/Invoke para trazer janela para frente
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        private const int SW_RESTORE = 9;
     }
 }
