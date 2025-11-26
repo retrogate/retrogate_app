@@ -14,7 +14,7 @@ namespace RetroGate.Grpc.Services
         IDeleteGame deleteGame,
         ICancelInstallation cancelInstallation,
         IInstallerRepository installerRepository,
-        ConcurrentDictionary<string, Subscriber<InstallerEventModel>> subscribers
+        ConcurrentDictionary<string, Subscriber<SDK.Installer.Domain.Models.InstallerEventModel>> subscribers
     ) : Protos.Installer.Proto.V1.InstallerService.InstallerServiceBase
     {
         public override async Task<InstallResponse> Install(InstallRequest request, ServerCallContext context)
@@ -53,7 +53,7 @@ namespace RetroGate.Grpc.Services
 
         public override async Task SubscribeEvents(Empty request, IServerStreamWriter<InstallerEventModel> responseStream, ServerCallContext context)
         {
-            var subscriber = new Subscriber<InstallerEventModel>();
+            var subscriber = new Subscriber<SDK.Installer.Domain.Models.InstallerEventModel>();
 
             if(subscribers.IsEmpty)
             {
@@ -63,7 +63,10 @@ namespace RetroGate.Grpc.Services
             if(subscribers.TryAdd(context.Peer, subscriber))
             {
                 subscribers[context.Peer] = subscriber;
-                await responseStream.WriteAsync(installerRepository.LastEvent.ToProto());
+                if(installerRepository.LastEvent != null)
+                {
+                    await responseStream.WriteAsync(installerRepository.LastEvent.ToProto());
+                }
             }
             else
             {
@@ -77,7 +80,7 @@ namespace RetroGate.Grpc.Services
                     await subscriber.DataAvailable.WaitAsync(context.CancellationToken);
                     while (subscriber.Queue.TryDequeue(out var installerEvent))
                     {
-                        await responseStream.WriteAsync(installerEvent);
+                        await responseStream.WriteAsync(installerEvent.ToProto());
                     }
                 }
             }
@@ -105,7 +108,7 @@ namespace RetroGate.Grpc.Services
             var protoEvent = e.ToProto();
             foreach (var subscriber in subscribers.Values)
             {
-                subscriber.Queue.Enqueue(protoEvent);
+                subscriber.Queue.Enqueue(protoEvent.ToDomain());
                 subscriber.DataAvailable.Set();
             }
         }

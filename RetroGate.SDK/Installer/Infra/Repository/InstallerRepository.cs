@@ -14,9 +14,10 @@ namespace RetroGate.SDK.Installer.Infra.Repository
 {
     public class InstallerRepository : IInstallerRepository
     {
-        public InstallerEventModel LastEvent {get; private set; } = new InstallerEventModel();
+        public InstallerEventModel? LastEvent {get; private set; }
         private readonly IGetGameById _getGameById;
         private readonly ICreateShortcut _createShortcut;
+        private readonly ICreateGame _createGame;
         private readonly HttpClient _httpClient;
         private readonly string _installBasePath;
         private readonly ConcurrentDictionary<string, CancellationTokenSource> _activeTasks;
@@ -27,10 +28,12 @@ namespace RetroGate.SDK.Installer.Infra.Repository
         public InstallerRepository(
             IGetGameById getGameById,
             ICreateShortcut createShortcut,
+            ICreateGame createGame,
             ConfigModel config)
         {
             _getGameById = getGameById;
             _createShortcut = createShortcut;
+            _createGame = createGame;
             _httpClient = new HttpClient();
             _installBasePath = config.InstalledGamesPath ?? Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -82,6 +85,12 @@ namespace RetroGate.SDK.Installer.Infra.Repository
                     Directory.Delete(installPath, true);
                 }
 
+                if(_activeTasks.ContainsKey(gameId))
+                {
+                    Console.WriteLine($"[Installer] Instalação do jogo {gameId} já está em andamento");
+                    return new ErrorAlreadyExists();
+                }
+
                 // Cria CancellationTokenSource para permitir cancelamento
                 var cts = new CancellationTokenSource();
                 _activeTasks[gameId] = cts;
@@ -104,6 +113,8 @@ namespace RetroGate.SDK.Installer.Infra.Repository
                     // Adiciona shortcut no Steam
                     await AddShortcutToSteam(game, finalInstallPath, restartSteam);
                     Console.WriteLine($"[Installer] Shortcut adicionado ao Steam");
+
+                    await CreateGame(game);
 
                     // Limpa o arquivo de download
                     if (File.Exists(downloadPath))
@@ -369,11 +380,11 @@ namespace RetroGate.SDK.Installer.Infra.Repository
             var userId = GetSteamUserId();
             Console.WriteLine($"[Installer] Criando shortcut para usuário Steam: {userId}");
 
-            var result = await _createShortcut.Call(shortcut);
+            var createShortcut = await _createShortcut.Call(shortcut);
 
-            if (result.IsLeft)
+            if (createShortcut.IsLeft)
             {
-                var error = result.LeftAsEnumerable().First();
+                var error = createShortcut.LeftAsEnumerable().First();
                 Console.WriteLine($"[Installer] Erro ao criar shortcut: {error.Message}");
                 throw new Exception($"Erro ao criar shortcut: {error.Message}");
             }
@@ -384,6 +395,15 @@ namespace RetroGate.SDK.Installer.Infra.Repository
             {
                 RestartSteam();
             }
+        }
+
+        private async Task CreateGame(GameModel game)
+        {
+            var createGame = await _createGame.Call(GameSource.InstalledGames, game);
+            createGame.Match(
+                (Right) => Console.WriteLine($"[Installer] Game {Right.Name} instalado com sucesso"),
+                (Left) => Console.WriteLine($"[Installer] Falha ao instalar o jogo {game.Name}: {Left}")
+            );
         }
 
         private static string GetSteamUserId()

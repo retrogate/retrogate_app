@@ -8,7 +8,7 @@ namespace RetroGate.SDK.Installer.Domain.Repository
     {
         event EventHandler<InstallerEventModel> OnInstallerEvent;
 
-        InstallerEventModel LastEvent { get; }
+        InstallerEventModel? LastEvent { get; }
 
         Task<Either<ErrorBase, string>> Install(string gameId, bool replace = false, bool restartSteam = false);
 
