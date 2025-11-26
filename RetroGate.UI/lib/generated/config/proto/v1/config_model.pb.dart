@@ -18,6 +18,7 @@ class ConfigModel extends $pb.GeneratedMessage {
     $core.String? steamPath,
     $core.String? steamUserId,
     $core.String? steamGridDbApiKey,
+    $core.String? installedGamesPath,
   }) {
     final $result = create();
     if (steamPath != null) {
@@ -29,6 +30,9 @@ class ConfigModel extends $pb.GeneratedMessage {
     if (steamGridDbApiKey != null) {
       $result.steamGridDbApiKey = steamGridDbApiKey;
     }
+    if (installedGamesPath != null) {
+      $result.installedGamesPath = installedGamesPath;
+    }
     return $result;
   }
   ConfigModel._() : super();
@@ -39,6 +43,7 @@ class ConfigModel extends $pb.GeneratedMessage {
     ..aOS(1, _omitFieldNames ? '' : 'steamPath')
     ..aOS(2, _omitFieldNames ? '' : 'steamUserId')
     ..aOS(3, _omitFieldNames ? '' : 'steamGridDbApiKey')
+    ..aOS(4, _omitFieldNames ? '' : 'installedGamesPath')
     ..hasRequiredFields = false
   ;
 
@@ -89,6 +94,15 @@ class ConfigModel extends $pb.GeneratedMessage {
   $core.bool hasSteamGridDbApiKey() => $_has(2);
   @$pb.TagNumber(3)
   void clearSteamGridDbApiKey() => clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.String get installedGamesPath => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set installedGamesPath($core.String v) { $_setString(3, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasInstalledGamesPath() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearInstalledGamesPath() => clearField(4);
 }
 
 

@@ -20,6 +20,7 @@ const ConfigModel$json = {
     {'1': 'steam_path', '3': 1, '4': 1, '5': 9, '10': 'steamPath'},
     {'1': 'steam_user_id', '3': 2, '4': 1, '5': 9, '10': 'steamUserId'},
     {'1': 'steam_grid_db_api_key', '3': 3, '4': 1, '5': 9, '10': 'steamGridDbApiKey'},
+    {'1': 'installed_games_path', '3': 4, '4': 1, '5': 9, '10': 'installedGamesPath'},
   ],
 };
 
@@ -27,5 +28,6 @@ const ConfigModel$json = {
 final $typed_data.Uint8List configModelDescriptor = $convert.base64Decode(
     'CgtDb25maWdNb2RlbBIdCgpzdGVhbV9wYXRoGAEgASgJUglzdGVhbVBhdGgSIgoNc3RlYW1fdX'
     'Nlcl9pZBgCIAEoCVILc3RlYW1Vc2VySWQSMAoVc3RlYW1fZ3JpZF9kYl9hcGlfa2V5GAMgASgJ'
-    'UhFzdGVhbUdyaWREYkFwaUtleQ==');
+    'UhFzdGVhbUdyaWREYkFwaUtleRIwChRpbnN0YWxsZWRfZ2FtZXNfcGF0aBgEIAEoCVISaW5zdG'
+    'FsbGVkR2FtZXNQYXRo');
 

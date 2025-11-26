@@ -52,6 +52,14 @@ class GameServiceClient extends $grpc.Client {
       '/game.proto.v1.GameService/GetImages',
       ($0.GetImagesRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $3.GameImagesModel.fromBuffer(value));
+  static final _$findInstalledGames = $grpc.ClientMethod<$2.Empty, $0.GetAllResponse>(
+      '/game.proto.v1.GameService/FindInstalledGames',
+      ($2.Empty value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $0.GetAllResponse.fromBuffer(value));
+  static final _$launchGame = $grpc.ClientMethod<$0.LaunchGameRequest, $2.Empty>(
+      '/game.proto.v1.GameService/LaunchGame',
+      ($0.LaunchGameRequest value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $2.Empty.fromBuffer(value));
 
   GameServiceClient($grpc.ClientChannel channel,
       {$grpc.CallOptions? options,
@@ -85,6 +93,14 @@ class GameServiceClient extends $grpc.Client {
 
   $grpc.ResponseFuture<$3.GameImagesModel> getImages($0.GetImagesRequest request, {$grpc.CallOptions? options}) {
     return $createUnaryCall(_$getImages, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.GetAllResponse> findInstalledGames($2.Empty request, {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$findInstalledGames, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$2.Empty> launchGame($0.LaunchGameRequest request, {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$launchGame, request, options: options);
   }
 }
 
@@ -142,6 +158,20 @@ abstract class GameServiceBase extends $grpc.Service {
         false,
         ($core.List<$core.int> value) => $0.GetImagesRequest.fromBuffer(value),
         ($3.GameImagesModel value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$2.Empty, $0.GetAllResponse>(
+        'FindInstalledGames',
+        findInstalledGames_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $2.Empty.fromBuffer(value),
+        ($0.GetAllResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.LaunchGameRequest, $2.Empty>(
+        'LaunchGame',
+        launchGame_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.LaunchGameRequest.fromBuffer(value),
+        ($2.Empty value) => value.writeToBuffer()));
   }
 
   $async.Future<$1.GameModel> create_Pre($grpc.ServiceCall call, $async.Future<$0.CreateGameRequest> request) async {
@@ -172,6 +202,14 @@ abstract class GameServiceBase extends $grpc.Service {
     return getImages(call, await request);
   }
 
+  $async.Future<$0.GetAllResponse> findInstalledGames_Pre($grpc.ServiceCall call, $async.Future<$2.Empty> request) async {
+    return findInstalledGames(call, await request);
+  }
+
+  $async.Future<$2.Empty> launchGame_Pre($grpc.ServiceCall call, $async.Future<$0.LaunchGameRequest> request) async {
+    return launchGame(call, await request);
+  }
+
   $async.Future<$1.GameModel> create($grpc.ServiceCall call, $0.CreateGameRequest request);
   $async.Future<$1.GameModel> getById($grpc.ServiceCall call, $0.GetByIdRequest request);
   $async.Future<$0.GetAllResponse> getAll($grpc.ServiceCall call, $0.GetAllRequest request);
@@ -179,4 +217,6 @@ abstract class GameServiceBase extends $grpc.Service {
   $async.Future<$1.GameModel> update($grpc.ServiceCall call, $0.UpdateGameRequest request);
   $async.Future<$2.Empty> delete($grpc.ServiceCall call, $0.GetByIdRequest request);
   $async.Future<$3.GameImagesModel> getImages($grpc.ServiceCall call, $0.GetImagesRequest request);
+  $async.Future<$0.GetAllResponse> findInstalledGames($grpc.ServiceCall call, $2.Empty request);
+  $async.Future<$2.Empty> launchGame($grpc.ServiceCall call, $0.LaunchGameRequest request);
 }

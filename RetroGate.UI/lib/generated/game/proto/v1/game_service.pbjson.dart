@@ -136,3 +136,15 @@ const GetImagesRequest$json = {
 final $typed_data.Uint8List getImagesRequestDescriptor = $convert.base64Decode(
     'ChBHZXRJbWFnZXNSZXF1ZXN0EhsKCWdhbWVfbmFtZRgBIAEoCVIIZ2FtZU5hbWU=');
 
+@$core.Deprecated('Use launchGameRequestDescriptor instead')
+const LaunchGameRequest$json = {
+  '1': 'LaunchGameRequest',
+  '2': [
+    {'1': 'game_id', '3': 1, '4': 1, '5': 9, '10': 'gameId'},
+  ],
+};
+
+/// Descriptor for `LaunchGameRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List launchGameRequestDescriptor = $convert.base64Decode(
+    'ChFMYXVuY2hHYW1lUmVxdWVzdBIXCgdnYW1lX2lkGAEgASgJUgZnYW1lSWQ=');
+

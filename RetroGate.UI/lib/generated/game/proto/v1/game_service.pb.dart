@@ -466,6 +466,56 @@ class GetImagesRequest extends $pb.GeneratedMessage {
   void clearGameName() => clearField(1);
 }
 
+class LaunchGameRequest extends $pb.GeneratedMessage {
+  factory LaunchGameRequest({
+    $core.String? gameId,
+  }) {
+    final $result = create();
+    if (gameId != null) {
+      $result.gameId = gameId;
+    }
+    return $result;
+  }
+  LaunchGameRequest._() : super();
+  factory LaunchGameRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory LaunchGameRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'LaunchGameRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'game.proto.v1'), createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'gameId')
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  LaunchGameRequest clone() => LaunchGameRequest()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  LaunchGameRequest copyWith(void Function(LaunchGameRequest) updates) => super.copyWith((message) => updates(message as LaunchGameRequest)) as LaunchGameRequest;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static LaunchGameRequest create() => LaunchGameRequest._();
+  LaunchGameRequest createEmptyInstance() => create();
+  static $pb.PbList<LaunchGameRequest> createRepeated() => $pb.PbList<LaunchGameRequest>();
+  @$core.pragma('dart2js:noInline')
+  static LaunchGameRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<LaunchGameRequest>(create);
+  static LaunchGameRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get gameId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set gameId($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasGameId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearGameId() => clearField(1);
+}
+
 
 const _omitFieldNames = $core.bool.fromEnvironment('protobuf.omit_field_names');
 const _omitMessageNames = $core.bool.fromEnvironment('protobuf.omit_message_names');
