@@ -14,7 +14,8 @@ namespace RetroGate.Grpc.Services
         IUpdateGame updateGame,
         IDeleteGame deleteGame,
         IGetGameImages getGameImages,
-        IFindInstalledGames findInstalledGames
+        IFindInstalledGames findInstalledGames,
+        ILaunchGame launchGame
     ) : Protos.Game.Proto.V1.GameService.GameServiceBase
     {
         public override async Task<GameModel> Create(CreateGameRequest request, ServerCallContext context)
@@ -111,6 +112,15 @@ namespace RetroGate.Grpc.Services
                     response.Games.AddRangeFromDomain(games);
                     return response;
                 },
+                Left: error => throw new RpcException(new Status(StatusCode.Internal, error.Message))
+            );
+        }
+
+        public override async Task<Empty> LaunchGame(LaunchGameRequest request, ServerCallContext context)
+        {
+            var result = await launchGame.Call(request.GameId);
+            return result.Match(
+                Right: _ => new Empty(),
                 Left: error => throw new RpcException(new Status(StatusCode.Internal, error.Message))
             );
         }
