@@ -6,6 +6,7 @@ namespace RetroGate.SDK.Game.Domain.Repository
 {
     public interface IInstalledGamesRepository : IGameRepository
     {
+        Task<Either<ErrorBase, Unit>> LaunchGame(string gameId);
         Task<Either<ErrorBase, List<GameModel>>> FindInstalledGames();
     }
 }
