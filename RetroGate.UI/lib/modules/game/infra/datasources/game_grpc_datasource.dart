@@ -95,6 +95,15 @@ class GameGrpcDataSource {
     }
   }
 
+  Future<void> launchGame(String id) async {
+    try {
+      final request = LaunchGameRequest()..gameId = id;
+      await _client.launchGame(request);
+    } catch (e) {
+      throw Exception('Failed to launch game: $e');
+    }
+  }
+
   void dispose() {
     channel.shutdown();
   }

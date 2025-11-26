@@ -110,4 +110,14 @@ class InstalledGamesRepositoryImpl implements IInstalledGamesRepository {
   proto.GameSource _gameSource(GameSource source) {
     return proto.GameSource.values[source.index];
   }
+  
+  @override
+  Future<Either<Exception, void>> launchGame(String id) async {
+    try {
+      await dataSource.launchGame(id);
+      return const Right(null);
+    } catch (e) {
+      return Left(Exception(e.toString()));
+    }
+  }
 }
