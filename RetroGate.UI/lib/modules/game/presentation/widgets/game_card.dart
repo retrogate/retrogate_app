@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../domain/models/game.dart';
 import '../../domain/models/game_source.dart';
+import '../../../installer/domain/models/installer_progress.dart';
 import 'gamepad_navigation_wrapper.dart';
 
 class GameCard extends StatefulWidget {
@@ -8,6 +9,7 @@ class GameCard extends StatefulWidget {
   final int index;
   final VoidCallback? onTap;
   final GameSource source;
+  final InstallerProgress? installProgress;
 
   const GameCard({
     super.key,
@@ -15,6 +17,7 @@ class GameCard extends StatefulWidget {
     required this.index,
     this.onTap,
     required this.source,
+    this.installProgress,
   });
 
   @override
@@ -115,15 +118,12 @@ class _GameCardState extends State<GameCard> {
                           color: const Color(0xFF66C0F4).withValues(alpha: 0.9),
                           shape: BoxShape.circle,
                         ),
-                        child: Icon(
-                          widget.source == GameSource.available 
-                              ? Icons.download 
-                              : Icons.play_arrow,
-                          color: Colors.white,
-                          size: 32,
-                        ),
+                        child: _buildCenterIcon(),
                       ),
                     ),
+                  // Installation progress overlay
+                  if (widget.installProgress != null && widget.installProgress!.isInProgress)
+                    _buildProgressOverlay(),
                   if (isSelected)
                     Positioned(
                       top: 8,
@@ -198,6 +198,84 @@ class _GameCardState extends State<GameCard> {
       ),
       maxLines: 2,
       overflow: TextOverflow.ellipsis,
+    );
+  }
+
+  Widget _buildCenterIcon() {
+    // If installing, show spinner
+    if (widget.installProgress != null && widget.installProgress!.isInProgress) {
+      return const CircularProgressIndicator(
+        color: Colors.white,
+        strokeWidth: 3,
+      );
+    }
+
+    // Show download icon for available games, play for installed
+    return Icon(
+      widget.source == GameSource.available 
+          ? Icons.download 
+          : Icons.play_arrow,
+      color: Colors.white,
+      size: 32,
+    );
+  }
+
+  Widget _buildProgressOverlay() {
+    final progress = widget.installProgress!;
+    
+    return Positioned.fill(
+      child: Container(
+        color: Colors.black.withValues(alpha: 0.85),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Progress circle with percentage
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                SizedBox(
+                  width: 80,
+                  height: 80,
+                  child: CircularProgressIndicator(
+                    value: progress.percentage / 100,
+                    strokeWidth: 6,
+                    backgroundColor: Colors.white.withValues(alpha: 0.2),
+                    valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF66C0F4)),
+                  ),
+                ),
+                Text(
+                  '${progress.percentage}%',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            // State label
+            Text(
+              progress.stateLabel,
+              style: const TextStyle(
+                color: Color(0xFF66C0F4),
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 4),
+            // Speed indicator (only for downloading)
+            if (progress.state == InstallerProgressState.downloading)
+              Text(
+                progress.speedFormatted,
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 12,
+                ),
+              ),
+          ],
+        ),
+      ),
     );
   }
 }
