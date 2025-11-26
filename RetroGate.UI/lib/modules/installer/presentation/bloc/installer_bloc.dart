@@ -23,6 +23,7 @@ class InstallerBloc extends Bloc<InstallerEvent, InstallerState> {
     required this.deleteGameUseCase,
   }) : super(const InstallerInitialState()) {
     on<SubscribeToProgressEvent>(_onSubscribeToProgress);
+    on<ProgressUpdatedEvent>(_onProgressUpdated);
     on<InstallGameEvent>(_onInstallGame);
     on<CancelInstallationEvent>(_onCancelInstallation);
     on<DeleteGameEvent>(_onDeleteGame);
@@ -39,20 +40,35 @@ class InstallerBloc extends Bloc<InstallerEvent, InstallerState> {
     
     _progressSubscription = subscribeToProgressUseCase().listen(
       (progress) {
-        final currentState = state;
-        final progressMap = currentState is InstallerDataState
-            ? Map<String, InstallerProgress>.from(currentState.progressMap)
-            : <String, InstallerProgress>{};
-        
-        // Update or add progress for this game
-        progressMap[progress.gameId] = progress;
-        
-        emit(InstallerDataState(progressMap));
+        // Add internal event instead of emitting directly
+        add(ProgressUpdatedEvent(progress));
       },
       onError: (error) {
-        emit(InstallerErrorState(error.toString()));
+        add(ProgressUpdatedEvent(
+          InstallerProgress(
+            gameId: '',
+            state: InstallerProgressState.failed,
+            percentage: 0,
+            speedInKbPerSec: 0,
+          ),
+        ));
       },
     );
+  }
+
+  void _onProgressUpdated(
+    ProgressUpdatedEvent event,
+    Emitter<InstallerState> emit,
+  ) {
+    final currentState = state;
+    final progressMap = currentState is InstallerDataState
+        ? Map<String, InstallerProgress>.from(currentState.progressMap)
+        : <String, InstallerProgress>{};
+    
+    // Update or add progress for this game
+    progressMap[event.progress.gameId] = event.progress;
+    
+    emit(InstallerDataState(progressMap));
   }
 
   Future<void> _onInstallGame(

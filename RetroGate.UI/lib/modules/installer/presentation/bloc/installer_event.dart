@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import '../../domain/models/installer_progress.dart';
 
 abstract class InstallerEvent extends Equatable {
   const InstallerEvent();
@@ -9,6 +10,15 @@ abstract class InstallerEvent extends Equatable {
 
 class SubscribeToProgressEvent extends InstallerEvent {
   const SubscribeToProgressEvent();
+}
+
+class ProgressUpdatedEvent extends InstallerEvent {
+  final InstallerProgress progress;
+
+  const ProgressUpdatedEvent(this.progress);
+
+  @override
+  List<Object?> get props => [progress];
 }
 
 class InstallGameEvent extends InstallerEvent {
