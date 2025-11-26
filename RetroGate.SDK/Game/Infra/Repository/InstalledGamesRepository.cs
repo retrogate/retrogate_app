@@ -36,5 +36,27 @@ namespace RetroGate.SDK.Game.Infra.Repository
             }
             return games;
         }
+
+        public async Task<Either<ErrorBase, Unit>> LaunchGame(string gameId)
+        {
+            var game = await GetById(gameId);
+            return await game.Match(
+                Right: g =>
+                {
+                    var installPath = Path.Combine(config.InstalledGamesPath, g.Id);
+                    var executableFullPath = Path.Combine(installPath, g.ExecutablePath);
+                    if (!File.Exists(executableFullPath))
+                    {
+                        return Task.FromResult<Either<ErrorBase, Unit>>(new ErrorBase($"Executable not found at path: {executableFullPath}"));
+                    }
+                    var process = new System.Diagnostics.Process();
+                    process.StartInfo.FileName = executableFullPath;
+                    process.StartInfo.WorkingDirectory = new FileInfo(executableFullPath).DirectoryName!;
+                    process.Start();
+                    return Task.FromResult<Either<ErrorBase, Unit>>(Unit.Default);
+                },
+                Left: err => Task.FromResult<Either<ErrorBase, Unit>>(err)
+            );
+        }
     }
 }
