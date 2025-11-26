@@ -12,6 +12,7 @@ import 'bloc/games_bloc.dart';
 import 'bloc/games_event.dart';
 import 'bloc/games_state.dart';
 import 'widgets/games_grid.dart';
+import 'widgets/game_context_menu.dart';
 
 class GamesListPage extends StatefulWidget {
   const GamesListPage({super.key});
@@ -300,6 +301,8 @@ class _GameTabContent extends StatefulWidget {
 }
 
 class _GameTabContentState extends State<_GameTabContent> with AutomaticKeepAliveClientMixin {
+  bool _isContextMenuOpen = false;
+
   @override
   bool get wantKeepAlive => true;
 
@@ -478,9 +481,10 @@ class _GameTabContentState extends State<_GameTabContent> with AutomaticKeepAliv
               final isActive = widget.tabController.index == widget.tabIndex;
               return GamesGrid(
                 games: games,
-                isDrawerOpen: widget.isDrawerOpen || !isActive,
+                isDrawerOpen: widget.isDrawerOpen || !isActive || _isContextMenuOpen,
                 source: widget.source,
                 onGameSelected: _handleGameSelected,
+                onContextMenu: _handleContextMenu,
               );
             },
           ),
@@ -512,5 +516,42 @@ class _GameTabContentState extends State<_GameTabContent> with AutomaticKeepAliv
       );
       BlocProvider.of<GamesBloc>(context).add(LaunchGameEvent(game.id));
     }
+  }
+
+  void _handleContextMenu(Game game, int index) {
+    setState(() {
+      _isContextMenuOpen = true;
+    });
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => GameContextMenu(
+        game: game,
+        onClose: () {
+          Navigator.of(context).pop();
+          setState(() {
+            _isContextMenuOpen = false;
+          });
+        },
+        onActionSelected: (action) {
+          // Por enquanto apenas mostra qual ação foi selecionada
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Action selected: ${action.name} for ${game.name}'),
+              backgroundColor: const Color(0xFF66C0F4),
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        },
+      ),
+    ).then((_) {
+      // Garante que o menu seja marcado como fechado mesmo se fechar clicando fora
+      if (mounted) {
+        setState(() {
+          _isContextMenuOpen = false;
+        });
+      }
+    });
   }
 }

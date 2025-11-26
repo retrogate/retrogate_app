@@ -13,13 +13,15 @@ class GamesGrid extends StatefulWidget {
   final List<Game> games;
   final bool isDrawerOpen;
   final void Function(Game game, int index)? onGameSelected;
+  final void Function(Game game, int index)? onContextMenu;
   final GameSource source;
 
   const GamesGrid({
     super.key,
     required this.games,
     this.isDrawerOpen = false,
-    this.onGameSelected,  
+    this.onGameSelected,
+    this.onContextMenu,
     required this.source,
   });
 
@@ -78,6 +80,10 @@ class _GamesGridState extends State<GamesGrid> {
                 ),
               );
             }
+          },
+          onContextMenu: (index) {
+            final game = widget.games[index];
+            widget.onContextMenu?.call(game, index);
           },
           child: GridView.builder(
             controller: _scrollController,

@@ -10,6 +10,7 @@ class GamepadNavigationWrapper extends StatefulWidget {
   final int itemCount;
   final int crossAxisCount;
   final Function(int index) onItemSelected;
+  final Function(int index)? onContextMenu;
   final bool enabled;
   final ScrollController? scrollController;
 
@@ -19,6 +20,7 @@ class GamepadNavigationWrapper extends StatefulWidget {
     required this.itemCount,
     required this.crossAxisCount,
     required this.onItemSelected,
+    this.onContextMenu,
     this.enabled = true,
     this.scrollController,
   });
@@ -68,6 +70,13 @@ class _GamepadNavigationWrapperState extends State<GamepadNavigationWrapper> {
       case '0':
       case 'button-0':
         _selectCurrentItem();
+        break;
+      case 'button_select':
+      case 'button_back':
+      case 'button_share':
+      case '6':
+      case 'button-6':
+        _openContextMenu();
         break;
     }
   }
@@ -180,6 +189,11 @@ class _GamepadNavigationWrapperState extends State<GamepadNavigationWrapper> {
   void _selectCurrentItem() {
     if (!widget.enabled) return;
     widget.onItemSelected(_selectedIndex);
+  }
+
+  void _openContextMenu() {
+    if (!widget.enabled) return;
+    widget.onContextMenu?.call(_selectedIndex);
   }
 }
 
