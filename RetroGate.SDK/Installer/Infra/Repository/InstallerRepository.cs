@@ -323,15 +323,24 @@ namespace RetroGate.SDK.Installer.Infra.Repository
                         entry.ExtractToFile(destinationPath, true);
                     }
 
+                    // Incrementa o contador após extrair cada arquivo
+                    extractedEntries++;
+
+                    // Reporta progresso a cada 500ms OU a cada 5% de progresso
                     var now = DateTime.Now;
-                    if ((now - lastReportTime).TotalMilliseconds > 500)
+                    var percentage = (extractedEntries * 100) / totalEntries;
+                    var shouldReport = (now - lastReportTime).TotalMilliseconds > 500 ||
+                                      (percentage % 5 == 0 && percentage > 0);
+
+                    if (shouldReport)
                     {
-                        extractedEntries++;
-                        var percentage = extractedEntries * 100 / totalEntries;
                         ReportProgress(game.Id, InstallerProgressState.Extracting, percentage, 0);
                         lastReportTime = now;
                     }
                 }
+
+                // Garante que reportamos 100% no final
+                ReportProgress(game.Id, InstallerProgressState.Extracting, 100, 0);
             }, cancellationToken);
 
             return extractPath;
