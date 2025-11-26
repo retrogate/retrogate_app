@@ -347,7 +347,7 @@ namespace RetroGate.SDK.Installer.Infra.Repository
             return extractPath;
         }
 
-        private async Task AddShortcutToSteam(
+        private async Task<Either<ErrorBase, Unit>> AddShortcutToSteam(
             GameModel game,
             string installPath,
             bool restartSteam = false)
@@ -396,7 +396,7 @@ namespace RetroGate.SDK.Installer.Infra.Repository
             {
                 var error = createShortcut.LeftAsEnumerable().First();
                 Console.WriteLine($"[Installer] Erro ao criar shortcut: {error.Message}");
-                throw new Exception($"Erro ao criar shortcut: {error.Message}");
+                return error;
             }
 
             Console.WriteLine($"[Installer] Shortcut criado com sucesso");
@@ -405,6 +405,8 @@ namespace RetroGate.SDK.Installer.Infra.Repository
             {
                 RestartSteam();
             }
+
+            return Unit.Default;
         }
 
         private async Task CreateGame(GameModel game)
