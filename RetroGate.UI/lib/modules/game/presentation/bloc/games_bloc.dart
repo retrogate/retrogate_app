@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:retrogate_ui/modules/game/domain/models/game_source.dart';
+import 'package:retrogate_ui/modules/game/domain/usecases/launch_game_usecase.dart';
 import '../../domain/models/game.dart';
 import '../../domain/usecases/get_all_games_usecase.dart';
 import '../../domain/usecases/create_game_usecase.dart';
@@ -11,16 +12,19 @@ class GamesBloc extends Bloc<GamesEvent, GamesState> {
   final GetAllGamesUseCase getAllGamesUseCase;
   final CreateGameUseCase createGameUseCase;
   final GetGameImagesUseCase getGameImagesUseCase;
+  final LaunchGameUseCase launchGameUseCase;
 
   GamesBloc({
     required this.getAllGamesUseCase,
     required this.createGameUseCase,
     required this.getGameImagesUseCase,
+    required this.launchGameUseCase,
   }) : super(const GamesInitialState()) {
     on<LoadGamesEvent>(_onLoadGames);
     on<RefreshGamesEvent>(_onRefreshGames);
     on<CreateGameEvent>(_onCreateGame);
     on<LoadGameImagesEvent>(_onLoadGameImages);
+    on<LaunchGameEvent>(_onLaunchGame);
   }
 
   Future<void> _onLoadGames(LoadGamesEvent event, Emitter<GamesState> emit) async {
@@ -77,6 +81,15 @@ class GamesBloc extends Bloc<GamesEvent, GamesState> {
         emit(GameImagesLoadedState(images));
       },
     );
+  }
+
+  Future<void> _onLaunchGame(LaunchGameEvent event, Emitter<GamesState> emit) async {
+    try {
+      await launchGameUseCase(event.gameId);
+      // Optionally, you can emit a state indicating the game launch was successful
+    } catch (error) {
+      emit(GamesErrorState('Failed to launch game: ${error.toString()}'));
+    }
   }
 
   Future<void> _fetchGames(GameSource source, Emitter<GamesState> emit, GamesDataState currentData) async {

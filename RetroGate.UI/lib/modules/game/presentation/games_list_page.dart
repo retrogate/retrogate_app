@@ -494,7 +494,6 @@ class _GameTabContentState extends State<_GameTabContent> with AutomaticKeepAliv
       // Start installation for available games
       final installerBloc = Modular.get<InstallerBloc>();
       installerBloc.add(InstallGameEvent(game.id));
-      
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Starting installation of ${game.name}...'),
@@ -511,7 +510,7 @@ class _GameTabContentState extends State<_GameTabContent> with AutomaticKeepAliv
           duration: const Duration(seconds: 2),
         ),
       );
-      // TODO: Implement game launch
+      BlocProvider.of<GamesBloc>(context).add(LaunchGameEvent(game.id));
     }
   }
 }

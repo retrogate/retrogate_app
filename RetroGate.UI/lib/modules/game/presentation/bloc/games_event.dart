@@ -45,3 +45,12 @@ class LoadGameImagesEvent extends GamesEvent {
   @override
   List<Object?> get props => [gameName];
 }
+
+class LaunchGameEvent extends GamesEvent {
+  final String gameId;
+
+  const LaunchGameEvent(this.gameId);
+
+  @override
+  List<Object?> get props => [gameId];
+}
