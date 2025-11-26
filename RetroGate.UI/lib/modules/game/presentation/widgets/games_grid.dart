@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:retrogate_ui/modules/installer/domain/models/installer_progress.dart';
 import '../../domain/models/game.dart';
 import '../../domain/models/game_source.dart';
 import '../../../installer/presentation/bloc/installer_bloc.dart';
@@ -97,7 +98,9 @@ class _GamesGridState extends State<GamesGrid> {
                   final progress = installerState is InstallerDataState
                       ? installerState.getProgress(game.id)
                       : null;
-                  
+                  if(progress != null) {
+                    game.isInstalled = progress.state == InstallerProgressState.completed;
+                  }
                   return GameCard(
                     game: game,
                     index: index,
