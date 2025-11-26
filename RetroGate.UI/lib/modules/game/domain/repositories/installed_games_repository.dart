@@ -10,4 +10,5 @@ abstract class IInstalledGamesRepository {
   Future<Either<Exception, List<Game>>> findInstalledGames();
   Future<Either<Exception, Game>> update(GameSource source, Game game);
   Future<Either<Exception, void>> delete(GameSource source, String id);
+  Future<Either<Exception, void>> launchGame(String id);
 }
