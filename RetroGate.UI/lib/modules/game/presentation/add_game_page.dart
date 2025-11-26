@@ -88,6 +88,7 @@ class _AddGamePageState extends State<AddGamePage> {
         imagePosterUrl: _posterImageUrl ?? '',
         imageLogoUrl: _logoImageUrl ?? '',
         installationMethod: GameInstallationMethod.extract,
+        source: GameSource.available,
         settingsFile: settingsFile.isEmpty ? null : settingsFile,
       );
 

@@ -489,8 +489,8 @@ class _GameTabContentState extends State<_GameTabContent> with AutomaticKeepAliv
     );
   }
 
-  void _handleGameSelected(Game game, GameSource source, int index) {
-    if (source == GameSource.available) {
+  void _handleGameSelected(Game game, int index) {
+    if (game.isInstalled == false) {
       // Start installation for available games
       final installerBloc = Modular.get<InstallerBloc>();
       installerBloc.add(InstallGameEvent(game.id));

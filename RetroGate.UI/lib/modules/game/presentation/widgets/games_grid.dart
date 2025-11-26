@@ -11,7 +11,7 @@ import 'gamepad_navigation_wrapper.dart';
 class GamesGrid extends StatefulWidget {
   final List<Game> games;
   final bool isDrawerOpen;
-  final void Function(Game game, GameSource source, int index)? onGameSelected;
+  final void Function(Game game, int index)? onGameSelected;
   final GameSource source;
 
   const GamesGrid({
@@ -66,7 +66,7 @@ class _GamesGridState extends State<GamesGrid> {
             
             // Call custom callback if provided
             if (widget.onGameSelected != null) {
-              widget.onGameSelected!(game, widget.source, index);
+              widget.onGameSelected!(game, index);
             } else {
               // Default behavior: show snackbar
               ScaffoldMessenger.of(context).showSnackBar(
@@ -101,11 +101,10 @@ class _GamesGridState extends State<GamesGrid> {
                   return GameCard(
                     game: game,
                     index: index,
-                    source: widget.source,
                     installProgress: progress,
                     onTap: () {
                       if (widget.onGameSelected != null) {
-                        widget.onGameSelected!(game, widget.source, index);
+                        widget.onGameSelected!(game, index);
                       }
                     },
                   );

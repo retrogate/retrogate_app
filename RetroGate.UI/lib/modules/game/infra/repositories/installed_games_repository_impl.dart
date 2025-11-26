@@ -16,7 +16,7 @@ class InstalledGamesRepositoryImpl implements IInstalledGamesRepository {
     try {
       final protoGame = _toProto(game);
       final createdProto = await dataSource.create(_gameSource(source), protoGame);
-      final createdGame = Game.fromProto(createdProto);
+      final createdGame = Game.fromProto(createdProto, source);
       return Right(createdGame);
     } catch (e) {
       return Left(Exception(e.toString()));
@@ -27,7 +27,7 @@ class InstalledGamesRepositoryImpl implements IInstalledGamesRepository {
   Future<Either<Exception, List<Game>>> getAll(GameSource source) async {
     try {
       final protoGames = await dataSource.getAll(_gameSource(source));
-      final games = protoGames.map((proto) => Game.fromProto(proto)).toList();
+      final games = protoGames.map((proto) => Game.fromProto(proto, source)).toList();
       return Right(games);
     } catch (e) {
       return Left(Exception(e.toString()));
@@ -38,7 +38,7 @@ class InstalledGamesRepositoryImpl implements IInstalledGamesRepository {
   Future<Either<Exception, Game>> getById(GameSource source, String id) async {
     try {
       final protoGame = await dataSource.getById(_gameSource(source), id);
-      final game = Game.fromProto(protoGame);
+      final game = Game.fromProto(protoGame, source);
       return Right(game);
     } catch (e) {
       return Left(Exception(e.toString()));
@@ -49,7 +49,7 @@ class InstalledGamesRepositoryImpl implements IInstalledGamesRepository {
   Future<Either<Exception, List<Game>>> findByName(GameSource source, String name) async {
     try {
       final protoGames = await dataSource.findByName(_gameSource(source), name);
-      final games = protoGames.map((proto) => Game.fromProto(proto)).toList();
+      final games = protoGames.map((proto) => Game.fromProto(proto, source)).toList();
       return Right(games);
     } catch (e) {
       return Left(Exception(e.toString()));
@@ -59,7 +59,7 @@ class InstalledGamesRepositoryImpl implements IInstalledGamesRepository {
   @override
   Future<Either<Exception, List<Game>>> findInstalledGames() async {
     try {
-      // TODO: Implementar chamada gRPC específica para jogos instalados
+      // TODO: Implementar chamada gRPC para buscar para jogos instalados
       // Por enquanto, retorna lista vazia
       return const Right([]);
     } catch (e) {
@@ -72,7 +72,7 @@ class InstalledGamesRepositoryImpl implements IInstalledGamesRepository {
     try {
       final protoGame = _toProto(game);
       final updatedProto = await dataSource.update(_gameSource(source), protoGame);
-      final updatedGame = Game.fromProto(updatedProto);
+      final updatedGame = Game.fromProto(updatedProto, source);
       return Right(updatedGame);
     } catch (e) {
       return Left(Exception(e.toString()));

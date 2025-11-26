@@ -1,3 +1,6 @@
+
+import 'package:retrogate_ui/modules/game/domain/models/game_source.dart';
+
 enum GameInstallationMethod {
   extract,
 }
@@ -11,7 +14,9 @@ class Game {
   final String imagePosterUrl;
   final String imageLogoUrl;
   final GameInstallationMethod installationMethod;
+  final GameSource source;
   final String? settingsFile;
+  bool isInstalled = false;
 
   Game({
     required this.id,
@@ -22,10 +27,11 @@ class Game {
     required this.imagePosterUrl,
     required this.imageLogoUrl,
     required this.installationMethod,
+    required this.source,
     this.settingsFile,
   });
 
-  factory Game.fromProto(dynamic proto) {
+  factory Game.fromProto(dynamic proto, GameSource source) {
     return Game(
       id: proto.id,
       name: proto.name,
@@ -35,6 +41,7 @@ class Game {
       imagePosterUrl: proto.imagePosterUrl,
       imageLogoUrl: proto.imageLogoUrl,
       installationMethod: GameInstallationMethod.values[proto.installationMethod.value],
+      source: source,
       settingsFile: proto.hasSettingsFile() ? proto.settingsFile : null,
     );
   }

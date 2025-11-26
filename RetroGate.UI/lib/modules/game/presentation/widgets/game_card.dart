@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../domain/models/game.dart';
-import '../../domain/models/game_source.dart';
 import '../../../installer/domain/models/installer_progress.dart';
 import 'gamepad_navigation_wrapper.dart';
 
@@ -8,7 +7,6 @@ class GameCard extends StatefulWidget {
   final Game game;
   final int index;
   final VoidCallback? onTap;
-  final GameSource source;
   final InstallerProgress? installProgress;
 
   const GameCard({
@@ -16,7 +14,6 @@ class GameCard extends StatefulWidget {
     required this.game,
     required this.index,
     this.onTap,
-    required this.source,
     this.installProgress,
   });
 
@@ -212,9 +209,9 @@ class _GameCardState extends State<GameCard> {
 
     // Show download icon for available games, play for installed
     return Icon(
-      widget.source == GameSource.available 
-          ? Icons.download 
-          : Icons.play_arrow,
+      widget.game.isInstalled 
+          ? Icons.play_arrow
+          : Icons.download,
       color: Colors.white,
       size: 32,
     );

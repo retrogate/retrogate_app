@@ -16,7 +16,18 @@ class GetAllGamesUseCase {
   Future<Either<Exception, List<Game>>> call(GameSource source) async {
     switch (source) {
       case GameSource.available:
-        return await availableGamesRepository.getAll(source);
+        var installedGames = await installedGamesRepository.getAll(GameSource.installed);
+        var availableGames = await availableGamesRepository.getAll(source);
+        installedGames.fold(
+          (l) {}, 
+          (r) {
+            for (var game in availableGames.getOrElse(() => [])) {
+              if (r.any((installedGame) => installedGame.id == game.id)) {
+                game.isInstalled = true;
+              }
+            }
+          });
+        return availableGames;
       case GameSource.installed:
         return await installedGamesRepository.getAll(source);
     }
