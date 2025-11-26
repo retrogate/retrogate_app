@@ -1,4 +1,5 @@
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:retrogate_ui/modules/game/domain/usecases/launch_game_usecase.dart';
 import 'domain/repositories/available_games_repository.dart';
 import 'domain/repositories/installed_games_repository.dart';
 import 'domain/usecases/get_all_games_usecase.dart';
@@ -79,6 +80,10 @@ class GameModule extends Module {
       ),
     );
     
+    i.addLazySingleton<LaunchGameUseCase>(
+      () => LaunchGameUseCase(i.get<IInstalledGamesRepository>()),
+    );
+
     // UseCases - Single repository (no switching)
     i.addLazySingleton<GetGameImagesUseCase>(
       () => GetGameImagesUseCase(i.get<IAvailableGamesRepository>()),
@@ -94,6 +99,7 @@ class GameModule extends Module {
         getAllGamesUseCase: i.get<GetAllGamesUseCase>(),
         createGameUseCase: i.get<CreateGameUseCase>(),
         getGameImagesUseCase: i.get<GetGameImagesUseCase>(),
+        launchGameUseCase: i.get<LaunchGameUseCase>(),
       ),
     );
   }
