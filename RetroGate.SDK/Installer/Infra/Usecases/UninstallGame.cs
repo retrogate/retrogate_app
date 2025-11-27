@@ -5,11 +5,11 @@ using RetroGate.SDK.Installer.Domain.Usecases;
 
 namespace RetroGate.SDK.Installer.Infra.Usecases
 {
-    public class DeleteGame(IInstallerRepository repository) : IDeleteGame
+    public class UninstallGame(IInstallerRepository repository) : IUninstallGame
     {
-        public Task<Either<ErrorBase, Unit>> Call(string[] paths)
+        public Task<Either<ErrorBase, Unit>> Call(string gameId, bool restartSteam)
         {
-            return repository.Delete(paths);
+            return repository.Uninstall(gameId, restartSteam);
         }
     }
 }

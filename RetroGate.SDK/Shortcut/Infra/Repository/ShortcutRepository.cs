@@ -86,6 +86,43 @@ namespace RetroGate.SDK.Shortcut.Infra.Repository
             }
         }
 
+        private async Task DeleteGridImages(ShortcutModel shortcut)
+        {
+            if (shortcut.AppId == null || shortcut.AppId.Length != 4)
+            {
+                Console.WriteLine("[ShortcutRepository] AppId inválido, não é possível deletar imagens do grid.");
+                return;
+            }
+
+            // Converte AppId para uint
+            uint appId = BitConverter.ToUInt32(shortcut.AppId, 0);
+            string gridPath = Path.Combine(_config.SteamPath, "userdata", _config.SteamUserId, "config", "grid");
+
+            // Deleta Hero Image (imagem horizontal grande)
+            string heroPath = Path.Combine(gridPath, $"{appId}_hero.jpg");
+            if (File.Exists(heroPath))
+            {
+                File.Delete(heroPath);
+                Console.WriteLine($"[ShortcutRepository] Deletado Hero Image: {heroPath}");
+            }
+
+            // Deleta Poster Image (imagem vertical)
+            string posterPath = Path.Combine(gridPath, $"{appId}p.jpg");
+            if (File.Exists(posterPath))
+            {
+                File.Delete(posterPath);
+                Console.WriteLine($"[ShortcutRepository] Deletado Poster Image: {posterPath}");
+            }
+
+            // Deleta Logo Image (logo/ícone)
+            string logoPath = Path.Combine(gridPath, $"{appId}.jpg");
+            if (File.Exists(logoPath))
+            {
+                File.Delete(logoPath);
+                Console.WriteLine($"[ShortcutRepository] Deletado Logo Image: {logoPath}");
+            }
+        }
+
         private async Task DownloadImage(string url, string savePath, string imageType)
         {
             try
@@ -467,6 +504,32 @@ namespace RetroGate.SDK.Shortcut.Infra.Repository
                 Array.Reverse(bytes);
 
             return Encoding.Latin1.GetString(bytes);
+        }
+
+        public async Task<Either<ErrorBase, Unit>> Delete(string appId)
+        {
+            var filepath = Path.Combine(_config.SteamPath, "userdata", _config.SteamUserId, "config", "shortcuts.vdf");
+            List<ShortcutModel> shortcuts = new List<ShortcutModel>();
+            if (File.Exists(filepath) && new FileInfo(filepath).Length > 0)
+            {
+                var getAllResult = GetAll().Result;
+                if (getAllResult.IsRight)
+                {
+                    shortcuts = getAllResult.RightToList()[0];
+                }
+            }
+
+            var shortcutToRemove = shortcuts.FirstOrDefault(s => s.AppId != null && BitConverter.ToUInt32(s.AppId, 0).ToString() == appId);
+            if (shortcutToRemove == null)
+            {
+                return new ErrorNotFound();
+            }
+        
+            shortcuts.Remove(shortcutToRemove);
+            WriteShortcuts(filepath, shortcuts);
+            await DeleteGridImages(shortcutToRemove);
+
+            return Unit.Default;
         }
     }
 }

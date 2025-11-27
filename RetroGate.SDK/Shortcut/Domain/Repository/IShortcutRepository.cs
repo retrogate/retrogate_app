@@ -8,5 +8,6 @@ namespace RetroGate.SDK.Shortcut.Domain.Repository
     {
         Task<Either<ErrorBase, List<ShortcutModel>>> GetAll();
         Task<Either<ErrorBase, ShortcutModel>> Create(ShortcutModel shortcut);
+        Task<Either<ErrorBase, Unit>> Delete(string appId);
     }
 }

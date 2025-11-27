@@ -58,7 +58,7 @@ namespace RetroGate.SDK.Game.Infra.Repository
                     process.Start();
                     
                     // Aguarda um pouco para a janela ser criada
-                    System.Threading.Thread.Sleep(500);
+                    Thread.Sleep(1500);
                     
                     // Traz a janela para frente
                     if (!process.HasExited && process.MainWindowHandle != IntPtr.Zero)

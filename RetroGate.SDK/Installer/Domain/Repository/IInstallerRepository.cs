@@ -12,7 +12,7 @@ namespace RetroGate.SDK.Installer.Domain.Repository
 
         Task<Either<ErrorBase, string>> Install(string gameId, bool replace = false, bool restartSteam = false);
 
-        Task<Either<ErrorBase, Unit>> Delete(string[] paths);
+        Task<Either<ErrorBase, Unit>> Uninstall(string gameId, bool restartSteam = false);
 
         Task<Either<ErrorBase, Unit>> Cancel(string id);
     }

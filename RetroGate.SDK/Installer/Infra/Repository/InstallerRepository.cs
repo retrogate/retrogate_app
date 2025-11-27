@@ -17,6 +17,7 @@ namespace RetroGate.SDK.Installer.Infra.Repository
         public InstallerEventModel? LastEvent {get; private set; }
         private readonly IGetGameById _getGameById;
         private readonly ICreateShortcut _createShortcut;
+        private readonly IDeleteShortcut _deleteShortcut;
         private readonly ICreateGame _createGame;
         private readonly HttpClient _httpClient;
         private readonly string _installBasePath;
@@ -28,11 +29,13 @@ namespace RetroGate.SDK.Installer.Infra.Repository
         public InstallerRepository(
             IGetGameById getGameById,
             ICreateShortcut createShortcut,
+            IDeleteShortcut deleteShortcut,
             ICreateGame createGame,
             ConfigModel config)
         {
             _getGameById = getGameById;
             _createShortcut = createShortcut;
+            _deleteShortcut = deleteShortcut;
             _createGame = createGame;
             _httpClient = new HttpClient();
             _installBasePath = config.InstalledGamesPath ?? Path.Combine(
@@ -149,7 +152,7 @@ namespace RetroGate.SDK.Installer.Infra.Repository
             }
         }
 
-        public Task<Either<ErrorBase, Unit>> Delete(string[] paths)
+        private Task<Either<ErrorBase, Unit>> Delete(string[] paths)
         {
             try
             {
@@ -492,6 +495,20 @@ namespace RetroGate.SDK.Installer.Infra.Repository
                 Console.WriteLine($"[Installer] Erro: Caminho do Steam não encontrado: {steamPath}");
             }
         }
-    }
 
+        public async Task<Either<ErrorBase, Unit>> Uninstall(string gameId, bool restartSteam = false)
+        {
+            var installPath = Path.Combine(_installBasePath, gameId);
+            var result = await Delete([installPath]);
+            if(result.IsRight)
+            {
+                await _deleteShortcut.Call(gameId);
+                if(restartSteam)
+                {
+                    RestartSteam();
+                }
+            }
+            return result;
+        }
+    }
 }
