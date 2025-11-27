@@ -8,8 +8,8 @@ abstract class InstallerRepository {
     bool restartSteam = false,
   });
 
-  /// Delete game files
-  Future<void> delete(List<String> paths);
+  /// Uninstall a game
+  Future<void> uninstall(String id);
 
   /// Cancel installation
   Future<void> cancel(String id);
