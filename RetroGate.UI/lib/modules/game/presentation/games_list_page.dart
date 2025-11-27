@@ -72,6 +72,14 @@ class _GamesListPageState extends State<GamesListPage> with SingleTickerProvider
         }
       });
       
+      // Register back button (B) to close drawer when open
+      GamepadNavigationScope.registerBackAction(context, () {
+        final scaffoldState = _scaffoldKey.currentState;
+        if (scaffoldState != null && scaffoldState.isDrawerOpen) {
+          Navigator.of(context).pop(); // Close drawer
+        }
+      });
+      
       // Register L1/R1 for tab navigation
       GamepadNavigationScope.registerLeftBumperAction(context, () {
         if (_tabController.index > 0) {
