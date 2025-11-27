@@ -1,4 +1,5 @@
 using LanguageExt;
+using LanguageExt.Common;
 using RetroGate.SDK.Core.Domain.Models;
 using RetroGate.SDK.Core.Errors;
 using RetroGate.SDK.Game.Domain.Models;
@@ -19,6 +20,7 @@ namespace RetroGate.SDK.Installer.Infra.Repository
         private readonly ICreateShortcut _createShortcut;
         private readonly IDeleteShortcut _deleteShortcut;
         private readonly ICreateGame _createGame;
+        private readonly IDeleteGame _deleteGame;
         private readonly HttpClient _httpClient;
         private readonly string _installBasePath;
         private readonly ConcurrentDictionary<string, CancellationTokenSource> _activeTasks;
@@ -31,12 +33,14 @@ namespace RetroGate.SDK.Installer.Infra.Repository
             ICreateShortcut createShortcut,
             IDeleteShortcut deleteShortcut,
             ICreateGame createGame,
+            IDeleteGame deleteGame,
             ConfigModel config)
         {
             _getGameById = getGameById;
             _createShortcut = createShortcut;
             _deleteShortcut = deleteShortcut;
             _createGame = createGame;
+            _deleteGame = deleteGame;
             _httpClient = new HttpClient();
             _installBasePath = config.InstalledGamesPath ?? Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -499,16 +503,25 @@ namespace RetroGate.SDK.Installer.Infra.Repository
         public async Task<Either<ErrorBase, Unit>> Uninstall(string gameId, bool restartSteam = false)
         {
             var installPath = Path.Combine(_installBasePath, gameId);
-            var result = await Delete([installPath]);
-            if(result.IsRight)
+            var directoryInfo = new DirectoryInfo(installPath);
+            
+            if(directoryInfo.Exists)
             {
-                await _deleteShortcut.Call(gameId);
-                if(restartSteam)
+                var result = await Delete([installPath]);
+                if(result.IsLeft)
                 {
-                    RestartSteam();
+                    return result;
                 }
             }
-            return result;
+
+            await _deleteGame.Call(GameSource.InstalledGames, gameId);
+            await _deleteShortcut.Call(gameId);
+            if(restartSteam)
+            {
+                RestartSteam();
+            }
+            
+            return Unit.Default;
         }
     }
 }
