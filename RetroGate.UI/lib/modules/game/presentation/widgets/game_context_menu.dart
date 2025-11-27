@@ -51,6 +51,7 @@ class _GameContextMenuState extends State<GameContextMenu> {
   int _selectedIndex = 0;
   late List<_MenuOption> _options;
   StreamSubscription<GamepadEvent>? _gamepadSubscription;
+  bool _isProcessing = false;
 
   @override
   void initState() {
@@ -122,7 +123,9 @@ class _GameContextMenuState extends State<GameContextMenu> {
   }
 
   void _selectCurrentItem() {
-    if (!mounted) return;
+    if (!mounted || _isProcessing) return;
+    _isProcessing = true;
+    
     final option = _options[_selectedIndex];
     widget.onActionSelected(option.action);
     widget.onClose();
@@ -289,10 +292,9 @@ class _GameContextMenuState extends State<GameContextMenu> {
                         option: option,
                         isSelected: isSelected,
                         onTap: () {
-                          setState(() {
-                            _selectedIndex = index;
-                          });
-                          _selectCurrentItem();
+                          if (!mounted) return;
+                          widget.onActionSelected(option.action);
+                          widget.onClose();
                         },
                       );
                     },
@@ -330,12 +332,13 @@ class _GameContextMenuState extends State<GameContextMenu> {
     required bool isSelected,
     required VoidCallback onTap,
   }) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(4),
-        child: Container(
+    return GestureDetector(
+      onTap: () {
+        if (_isProcessing) return;
+        _isProcessing = true;
+        onTap();
+      },
+      child: Container(
           margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           decoration: BoxDecoration(
@@ -385,8 +388,7 @@ class _GameContextMenuState extends State<GameContextMenu> {
             ],
           ),
         ),
-      ),
-    );
+      );
   }
 
   Widget _buildHint(IconData icon, String label) {
