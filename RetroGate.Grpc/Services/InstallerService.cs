@@ -11,7 +11,7 @@ namespace RetroGate.Grpc.Services
 {
     public class InstallerService(
         IInstallGame installGame,
-        IDeleteGame deleteGame,
+        IUninstallGame uninstallGame,
         ICancelInstallation cancelInstallation,
         IInstallerRepository installerRepository,
         ConcurrentDictionary<string, Subscriber<SDK.Installer.Domain.Models.InstallerEventModel>> subscribers
@@ -30,10 +30,9 @@ namespace RetroGate.Grpc.Services
             );
         }
 
-        public override async Task<Empty> Delete(DeleteRequest request, ServerCallContext context)
+        public override async Task<Empty> Uninstall(UninstallRequest request, ServerCallContext context)
         {
-            var paths = request.Paths.ToArray();
-            var result = await deleteGame.Call(paths);
+            var result = await uninstallGame.Call(request.GameId, request.RestartSteam);
             
             return result.Match(
                 Right: _ => new Empty(),

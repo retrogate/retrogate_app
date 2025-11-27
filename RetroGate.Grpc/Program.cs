@@ -44,6 +44,7 @@ builder.Services.AddSingleton<ISetConfig, SetConfig>();
 builder.Services.AddSingleton<IShortcutRepository, ShortcutRepository>();
 builder.Services.AddSingleton<IGetAllShortcuts, GetAllShortcuts>();
 builder.Services.AddSingleton<ICreateShortcut, CreateShortcut>();
+builder.Services.AddSingleton<IDeleteShortcut, DeleteShortcut>();
 
 // Game service instances
 builder.Services.AddSingleton<IAvailableGamesRepository, AvailableGamesRepository>();
@@ -56,13 +57,13 @@ builder.Services.AddSingleton<IGetGameById, GetGameById>();
 builder.Services.AddSingleton<IUpdateGame, UpdateGame>();
 builder.Services.AddSingleton<IFindInstalledGames, FindInstalledGames>();
 builder.Services.AddSingleton<ILaunchGame, LaunchGame>();
-builder.Services.AddSingleton<RetroGate.SDK.Game.Domain.Usecases.IDeleteGame, RetroGate.SDK.Game.Infra.Usecases.DeleteGame>();
+builder.Services.AddSingleton<IDeleteGame, DeleteGame>();
 builder.Services.AddSingleton<IGetGameImages, GetGameImages>();
 
 // Installer service instances
 builder.Services.AddSingleton<IInstallerRepository, InstallerRepository>();
 builder.Services.AddSingleton<IInstallGame, InstallGame>();
-builder.Services.AddSingleton<RetroGate.SDK.Installer.Domain.Usecases.IDeleteGame, RetroGate.SDK.Installer.Infra.Usecases.DeleteGame>();
+builder.Services.AddSingleton<IUninstallGame, UninstallGame>();
 builder.Services.AddSingleton<ICancelInstallation, CancelInstallation>();
 
 var app = builder.Build();
