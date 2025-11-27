@@ -3,7 +3,7 @@ export 'domain/models/installer_progress.dart';
 export 'domain/repositories/installer_repository.dart';
 export 'domain/usecases/install_game_usecase.dart';
 export 'domain/usecases/cancel_installation_usecase.dart';
-export 'domain/usecases/delete_game_usecase.dart';
+export 'domain/usecases/uninstall_game_usecase.dart';
 export 'domain/usecases/subscribe_to_progress_usecase.dart';
 
 // Infra
