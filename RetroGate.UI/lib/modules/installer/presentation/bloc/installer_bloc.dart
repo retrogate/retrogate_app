@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:retrogate_ui/modules/installer/domain/usecases/uninstall_game_usecase.dart';
 import '../../domain/models/installer_progress.dart';
 import '../../domain/usecases/install_game_usecase.dart';
 import '../../domain/usecases/cancel_installation_usecase.dart';
-import '../../domain/usecases/delete_game_usecase.dart';
 import '../../domain/usecases/subscribe_to_progress_usecase.dart';
 import 'installer_event.dart';
 import 'installer_state.dart';
@@ -12,7 +12,7 @@ class InstallerBloc extends Bloc<InstallerEvent, InstallerState> {
   final SubscribeToProgressUseCase subscribeToProgressUseCase;
   final InstallGameUseCase installGameUseCase;
   final CancelInstallationUseCase cancelInstallationUseCase;
-  final DeleteGameUseCase deleteGameUseCase;
+  final UninstallGameUseCase uninstallGameUseCase;
 
   StreamSubscription? _progressSubscription;
 
@@ -20,13 +20,13 @@ class InstallerBloc extends Bloc<InstallerEvent, InstallerState> {
     required this.subscribeToProgressUseCase,
     required this.installGameUseCase,
     required this.cancelInstallationUseCase,
-    required this.deleteGameUseCase,
+    required this.uninstallGameUseCase,
   }) : super(const InstallerInitialState()) {
     on<SubscribeToProgressEvent>(_onSubscribeToProgress);
     on<ProgressUpdatedEvent>(_onProgressUpdated);
     on<InstallGameEvent>(_onInstallGame);
     on<CancelInstallationEvent>(_onCancelInstallation);
-    on<DeleteGameEvent>(_onDeleteGame);
+    on<UninstallGameEvent>(_onUninstallGame);
     
     // Auto-subscribe on initialization
     add(const SubscribeToProgressEvent());
@@ -95,12 +95,12 @@ class InstallerBloc extends Bloc<InstallerEvent, InstallerState> {
     }
   }
 
-  Future<void> _onDeleteGame(
-    DeleteGameEvent event,
+  Future<void> _onUninstallGame(
+    UninstallGameEvent event,
     Emitter<InstallerState> emit,
   ) async {
     try {
-      await deleteGameUseCase([event.gameId]);
+      await uninstallGameUseCase(event.gameId);
       // Game deleted
     } catch (error) {
       emit(InstallerErrorState(error.toString()));

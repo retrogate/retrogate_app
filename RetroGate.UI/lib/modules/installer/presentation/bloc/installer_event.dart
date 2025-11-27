@@ -39,10 +39,19 @@ class CancelInstallationEvent extends InstallerEvent {
   List<Object?> get props => [gameId];
 }
 
-class DeleteGameEvent extends InstallerEvent {
+// class DeleteGameEvent extends InstallerEvent {
+//   final String gameId;
+
+//   const DeleteGameEvent(this.gameId);
+
+//   @override
+//   List<Object?> get props => [gameId];
+// }
+
+class UninstallGameEvent extends InstallerEvent {
   final String gameId;
 
-  const DeleteGameEvent(this.gameId);
+  const UninstallGameEvent(this.gameId);
 
   @override
   List<Object?> get props => [gameId];
