@@ -40,17 +40,19 @@ const InstallResponse$json = {
 final $typed_data.Uint8List installResponseDescriptor = $convert.base64Decode(
     'Cg9JbnN0YWxsUmVzcG9uc2USIQoMaW5zdGFsbF9wYXRoGAEgASgJUgtpbnN0YWxsUGF0aA==');
 
-@$core.Deprecated('Use deleteRequestDescriptor instead')
-const DeleteRequest$json = {
-  '1': 'DeleteRequest',
+@$core.Deprecated('Use uninstallRequestDescriptor instead')
+const UninstallRequest$json = {
+  '1': 'UninstallRequest',
   '2': [
-    {'1': 'paths', '3': 1, '4': 3, '5': 9, '10': 'paths'},
+    {'1': 'game_id', '3': 1, '4': 1, '5': 9, '10': 'gameId'},
+    {'1': 'restart_steam', '3': 2, '4': 1, '5': 8, '10': 'restartSteam'},
   ],
 };
 
-/// Descriptor for `DeleteRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List deleteRequestDescriptor = $convert.base64Decode(
-    'Cg1EZWxldGVSZXF1ZXN0EhQKBXBhdGhzGAEgAygJUgVwYXRocw==');
+/// Descriptor for `UninstallRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List uninstallRequestDescriptor = $convert.base64Decode(
+    'ChBVbmluc3RhbGxSZXF1ZXN0EhcKB2dhbWVfaWQYASABKAlSBmdhbWVJZBIjCg1yZXN0YXJ0X3'
+    'N0ZWFtGAIgASgIUgxyZXN0YXJ0U3RlYW0=');
 
 @$core.Deprecated('Use cancelRequestDescriptor instead')
 const CancelRequest$json = {

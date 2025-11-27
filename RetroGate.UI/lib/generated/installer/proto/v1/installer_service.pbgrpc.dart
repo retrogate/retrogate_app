@@ -27,9 +27,9 @@ class InstallerServiceClient extends $grpc.Client {
       '/installer.proto.v1.InstallerService/Install',
       ($0.InstallRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.InstallResponse.fromBuffer(value));
-  static final _$delete = $grpc.ClientMethod<$0.DeleteRequest, $1.Empty>(
-      '/installer.proto.v1.InstallerService/Delete',
-      ($0.DeleteRequest value) => value.writeToBuffer(),
+  static final _$uninstall = $grpc.ClientMethod<$0.UninstallRequest, $1.Empty>(
+      '/installer.proto.v1.InstallerService/Uninstall',
+      ($0.UninstallRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $1.Empty.fromBuffer(value));
   static final _$cancel = $grpc.ClientMethod<$0.CancelRequest, $1.Empty>(
       '/installer.proto.v1.InstallerService/Cancel',
@@ -50,8 +50,8 @@ class InstallerServiceClient extends $grpc.Client {
     return $createUnaryCall(_$install, request, options: options);
   }
 
-  $grpc.ResponseFuture<$1.Empty> delete($0.DeleteRequest request, {$grpc.CallOptions? options}) {
-    return $createUnaryCall(_$delete, request, options: options);
+  $grpc.ResponseFuture<$1.Empty> uninstall($0.UninstallRequest request, {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$uninstall, request, options: options);
   }
 
   $grpc.ResponseFuture<$1.Empty> cancel($0.CancelRequest request, {$grpc.CallOptions? options}) {
@@ -75,12 +75,12 @@ abstract class InstallerServiceBase extends $grpc.Service {
         false,
         ($core.List<$core.int> value) => $0.InstallRequest.fromBuffer(value),
         ($0.InstallResponse value) => value.writeToBuffer()));
-    $addMethod($grpc.ServiceMethod<$0.DeleteRequest, $1.Empty>(
-        'Delete',
-        delete_Pre,
+    $addMethod($grpc.ServiceMethod<$0.UninstallRequest, $1.Empty>(
+        'Uninstall',
+        uninstall_Pre,
         false,
         false,
-        ($core.List<$core.int> value) => $0.DeleteRequest.fromBuffer(value),
+        ($core.List<$core.int> value) => $0.UninstallRequest.fromBuffer(value),
         ($1.Empty value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$0.CancelRequest, $1.Empty>(
         'Cancel',
@@ -102,8 +102,8 @@ abstract class InstallerServiceBase extends $grpc.Service {
     return install(call, await request);
   }
 
-  $async.Future<$1.Empty> delete_Pre($grpc.ServiceCall call, $async.Future<$0.DeleteRequest> request) async {
-    return delete(call, await request);
+  $async.Future<$1.Empty> uninstall_Pre($grpc.ServiceCall call, $async.Future<$0.UninstallRequest> request) async {
+    return uninstall(call, await request);
   }
 
   $async.Future<$1.Empty> cancel_Pre($grpc.ServiceCall call, $async.Future<$0.CancelRequest> request) async {
@@ -115,7 +115,7 @@ abstract class InstallerServiceBase extends $grpc.Service {
   }
 
   $async.Future<$0.InstallResponse> install($grpc.ServiceCall call, $0.InstallRequest request);
-  $async.Future<$1.Empty> delete($grpc.ServiceCall call, $0.DeleteRequest request);
+  $async.Future<$1.Empty> uninstall($grpc.ServiceCall call, $0.UninstallRequest request);
   $async.Future<$1.Empty> cancel($grpc.ServiceCall call, $0.CancelRequest request);
   $async.Stream<$2.InstallerEventModel> subscribeEvents($grpc.ServiceCall call, $1.Empty request);
 }

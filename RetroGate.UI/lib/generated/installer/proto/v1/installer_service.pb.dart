@@ -141,22 +141,27 @@ class InstallResponse extends $pb.GeneratedMessage {
   void clearInstallPath() => clearField(1);
 }
 
-class DeleteRequest extends $pb.GeneratedMessage {
-  factory DeleteRequest({
-    $core.Iterable<$core.String>? paths,
+class UninstallRequest extends $pb.GeneratedMessage {
+  factory UninstallRequest({
+    $core.String? gameId,
+    $core.bool? restartSteam,
   }) {
     final $result = create();
-    if (paths != null) {
-      $result.paths.addAll(paths);
+    if (gameId != null) {
+      $result.gameId = gameId;
+    }
+    if (restartSteam != null) {
+      $result.restartSteam = restartSteam;
     }
     return $result;
   }
-  DeleteRequest._() : super();
-  factory DeleteRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory DeleteRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  UninstallRequest._() : super();
+  factory UninstallRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory UninstallRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DeleteRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'installer.proto.v1'), createEmptyInstance: create)
-    ..pPS(1, _omitFieldNames ? '' : 'paths')
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'UninstallRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'installer.proto.v1'), createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'gameId')
+    ..aOB(2, _omitFieldNames ? '' : 'restartSteam')
     ..hasRequiredFields = false
   ;
 
@@ -164,25 +169,40 @@ class DeleteRequest extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
   'Will be removed in next major version')
-  DeleteRequest clone() => DeleteRequest()..mergeFromMessage(this);
+  UninstallRequest clone() => UninstallRequest()..mergeFromMessage(this);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  DeleteRequest copyWith(void Function(DeleteRequest) updates) => super.copyWith((message) => updates(message as DeleteRequest)) as DeleteRequest;
+  UninstallRequest copyWith(void Function(UninstallRequest) updates) => super.copyWith((message) => updates(message as UninstallRequest)) as UninstallRequest;
 
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  static DeleteRequest create() => DeleteRequest._();
-  DeleteRequest createEmptyInstance() => create();
-  static $pb.PbList<DeleteRequest> createRepeated() => $pb.PbList<DeleteRequest>();
+  static UninstallRequest create() => UninstallRequest._();
+  UninstallRequest createEmptyInstance() => create();
+  static $pb.PbList<UninstallRequest> createRepeated() => $pb.PbList<UninstallRequest>();
   @$core.pragma('dart2js:noInline')
-  static DeleteRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DeleteRequest>(create);
-  static DeleteRequest? _defaultInstance;
+  static UninstallRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<UninstallRequest>(create);
+  static UninstallRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.List<$core.String> get paths => $_getList(0);
+  $core.String get gameId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set gameId($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasGameId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearGameId() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.bool get restartSteam => $_getBF(1);
+  @$pb.TagNumber(2)
+  set restartSteam($core.bool v) { $_setBool(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasRestartSteam() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearRestartSteam() => clearField(2);
 }
 
 class CancelRequest extends $pb.GeneratedMessage {
