@@ -543,14 +543,7 @@ class _GameTabContentState extends State<_GameTabContent> with AutomaticKeepAliv
           }
         },
         onActionSelected: (action) {
-          // Por enquanto apenas mostra qual ação foi selecionada
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Action selected: ${action.name} for ${game.name}'),
-              backgroundColor: const Color(0xFF66C0F4),
-              duration: const Duration(seconds: 2),
-            ),
-          );
+          _handleMenuAction(action, game);
         },
       ),
     ).then((_) {
@@ -561,5 +554,89 @@ class _GameTabContentState extends State<_GameTabContent> with AutomaticKeepAliv
         });
       }
     });
+  }
+
+  void _handleMenuAction(GameContextMenuAction action, Game game) {
+    switch (action) {
+      case GameContextMenuAction.install:
+        // Iniciar instalação
+        final installerBloc = Modular.get<InstallerBloc>();
+        installerBloc.add(InstallGameEvent(game.id));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Starting installation of ${game.name}...'),
+            backgroundColor: const Color(0xFF66C0F4),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+        break;
+
+      case GameContextMenuAction.play:
+        // Lançar o jogo
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Launching ${game.name}...'),
+            backgroundColor: const Color(0xFF66C0F4),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+        BlocProvider.of<GamesBloc>(context).add(LaunchGameEvent(game.id));
+        break;
+
+      case GameContextMenuAction.cancelInstallation:
+        // TODO: Implementar cancelamento de instalação
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Cancel installation: ${game.name}'),
+            backgroundColor: const Color(0xFFD32F2F),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+        break;
+
+      case GameContextMenuAction.uninstall:
+        // TODO: Implementar desinstalação
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Uninstall: ${game.name}'),
+            backgroundColor: const Color(0xFFD32F2F),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+        break;
+
+      case GameContextMenuAction.edit:
+        // TODO: Implementar edição
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Edit: ${game.name}'),
+            backgroundColor: const Color(0xFF66C0F4),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+        break;
+
+      case GameContextMenuAction.hide:
+        // TODO: Implementar ocultar jogo
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Hide: ${game.name}'),
+            backgroundColor: const Color(0xFF66C0F4),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+        break;
+
+      case GameContextMenuAction.addToFavorites:
+        // TODO: Implementar adicionar aos favoritos
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Add to favorites: ${game.name}'),
+            backgroundColor: const Color(0xFF66C0F4),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+        break;
+    }
   }
 }
