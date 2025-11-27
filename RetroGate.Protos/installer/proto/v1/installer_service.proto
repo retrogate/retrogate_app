@@ -9,7 +9,7 @@ option csharp_namespace = "RetroGate.Protos.Installer.Proto.V1";
 
 service InstallerService {
     rpc Install(InstallRequest) returns (InstallResponse);
-    rpc Delete(DeleteRequest) returns (google.protobuf.Empty);
+    rpc Uninstall(UninstallRequest) returns (google.protobuf.Empty);
     rpc Cancel(CancelRequest) returns (google.protobuf.Empty);
     rpc SubscribeEvents(google.protobuf.Empty) returns (stream InstallerEventModel);
 }
@@ -24,8 +24,9 @@ message InstallResponse {
     string install_path = 1;
 }
 
-message DeleteRequest {
-    repeated string paths = 1;
+message UninstallRequest {
+    string game_id = 1;
+    bool restart_steam = 2; // If true, restarts Steam after removing shortcut
 }
 
 message CancelRequest {
