@@ -199,6 +199,7 @@ namespace RetroGate.SDK.Installer.Infra.Repository
                 {
                     Console.WriteLine($"[Installer] Cancelando instalação: {id}");
                     cts.Cancel();
+                    ReportProgress(id, InstallerProgressState.Cancelled, 0, 0);
                     return Task.FromResult<Either<ErrorBase, Unit>>(Unit.Default);
                 }
 
@@ -521,6 +522,8 @@ namespace RetroGate.SDK.Installer.Infra.Repository
                 RestartSteam();
             }
             
+            ReportProgress(gameId, InstallerProgressState.Uninstalled, 100, 0);
+
             return Unit.Default;
         }
     }

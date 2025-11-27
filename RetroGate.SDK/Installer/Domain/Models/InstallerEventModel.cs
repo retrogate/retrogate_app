@@ -7,8 +7,10 @@ namespace RetroGate.SDK.Installer.Domain.Models
         Extracting,
         CreatingShortcut,
         Paused,
+        Completed, 
         Failed,
-        Completed
+        Cancelled,
+        Uninstalled
     }
 
     public enum InstallerEventType

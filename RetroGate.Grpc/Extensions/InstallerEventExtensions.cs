@@ -67,6 +67,8 @@ namespace RetroGate.Grpc.Extensions
                 SDK.Installer.Domain.Models.InstallerProgressState.Paused => InstallerProgressState.Paused,
                 SDK.Installer.Domain.Models.InstallerProgressState.Failed => InstallerProgressState.Failed,
                 SDK.Installer.Domain.Models.InstallerProgressState.Completed => InstallerProgressState.Completed,
+                SDK.Installer.Domain.Models.InstallerProgressState.Cancelled => InstallerProgressState.Cancelled,
+                SDK.Installer.Domain.Models.InstallerProgressState.Uninstalled => InstallerProgressState.Uninstalled,
                 _ => InstallerProgressState.Idle,
             };
         }
@@ -82,6 +84,8 @@ namespace RetroGate.Grpc.Extensions
                 InstallerProgressState.Paused => SDK.Installer.Domain.Models.InstallerProgressState.Paused,
                 InstallerProgressState.Failed => SDK.Installer.Domain.Models.InstallerProgressState.Failed,
                 InstallerProgressState.Completed => SDK.Installer.Domain.Models.InstallerProgressState.Completed,
+                InstallerProgressState.Cancelled => SDK.Installer.Domain.Models.InstallerProgressState.Cancelled,
+                InstallerProgressState.Uninstalled => SDK.Installer.Domain.Models.InstallerProgressState.Uninstalled,
                 _ => SDK.Installer.Domain.Models.InstallerProgressState.Idle,
             };
         }
