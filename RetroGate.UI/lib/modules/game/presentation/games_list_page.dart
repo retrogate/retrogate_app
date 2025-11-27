@@ -559,27 +559,11 @@ class _GameTabContentState extends State<_GameTabContent> with AutomaticKeepAliv
   void _handleMenuAction(GameContextMenuAction action, Game game) {
     switch (action) {
       case GameContextMenuAction.install:
-        // Iniciar instalação
         final installerBloc = Modular.get<InstallerBloc>();
         installerBloc.add(InstallGameEvent(game.id));
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Starting installation of ${game.name}...'),
-            backgroundColor: const Color(0xFF66C0F4),
-            duration: const Duration(seconds: 2),
-          ),
-        );
         break;
 
       case GameContextMenuAction.play:
-        // Lançar o jogo
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Launching ${game.name}...'),
-            backgroundColor: const Color(0xFF66C0F4),
-            duration: const Duration(seconds: 2),
-          ),
-        );
         BlocProvider.of<GamesBloc>(context).add(LaunchGameEvent(game.id));
         break;
 
@@ -595,14 +579,8 @@ class _GameTabContentState extends State<_GameTabContent> with AutomaticKeepAliv
         break;
 
       case GameContextMenuAction.uninstall:
-        // TODO: Implementar desinstalação
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Uninstall: ${game.name}'),
-            backgroundColor: const Color(0xFFD32F2F),
-            duration: const Duration(seconds: 2),
-          ),
-        );
+        final installerBloc = Modular.get<InstallerBloc>();
+        installerBloc.add(UninstallGameEvent(game.id));
         break;
 
       case GameContextMenuAction.edit:
