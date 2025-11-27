@@ -29,8 +29,10 @@ class InstallerRepositoryImpl implements InstallerRepository {
   }
 
   @override
-  Future<void> delete(List<String> paths) async {
-    await _dataSource.delete(paths);
+  Future<void> uninstall(String id) {
+    return _dataSource.uninstall(
+      gameId: id,
+    );
   }
 
   @override

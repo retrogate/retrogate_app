@@ -40,12 +40,26 @@ class InstallerGrpcDataSource {
   }
 
   /// Delete game files
-  Future<void> delete(List<String> paths) async {
+  // Future<void> delete(List<String> paths) async {
+  //   try {
+  //     final request = DeleteRequest()..paths.addAll(paths);
+  //     await _client.delete(request);
+  //   } catch (e) {
+  //     throw Exception('Failed to delete game: $e');
+  //   }
+  // }
+
+  Future<void> uninstall({
+    required String gameId,
+    bool restartSteam = false,
+  }) async {
     try {
-      final request = DeleteRequest()..paths.addAll(paths);
-      await _client.delete(request);
+      final request = UninstallRequest()
+        ..gameId = gameId
+        ..restartSteam = restartSteam;
+      await _client.uninstall(request);
     } catch (e) {
-      throw Exception('Failed to delete game: $e');
+      throw Exception('Failed to uninstall game: $e');
     }
   }
 
