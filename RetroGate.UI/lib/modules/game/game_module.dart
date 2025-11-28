@@ -102,6 +102,7 @@ class GameModule extends Module {
         createGameUseCase: i.get<CreateGameUseCase>(),
         getGameImagesUseCase: i.get<GetGameImagesUseCase>(),
         launchGameUseCase: i.get<LaunchGameUseCase>(),
+        deleteGameUseCase: i.get<DeleteGameUseCase>(),
       ),
     );
   }
