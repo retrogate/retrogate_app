@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using LanguageExt;
 using RetroGate.SDK.Core.Domain.Models;
 using RetroGate.SDK.Core.Domain.Repository;
@@ -11,17 +12,32 @@ namespace RetroGate.SDK.Core.Infra
 
         private const string _deafultSteamPath = "C:\\Program Files (x86)\\Steam";
 
+        private ConfigModel _config;
+
+        public ConfigRepository(ConfigModel config)
+        {
+            _config = config;
+        }
+
         public Task<Either<ErrorBase, ConfigModel>> GetConfig()
         {
             var config = LoadFromFile();
-            return Task.FromResult(config != null
-                ? Prelude.Right<ErrorBase, ConfigModel>(config)
+            _config.SteamUserId = config.SteamUserId;
+            _config.SteamPath = config.SteamPath;
+            _config.SteamGridDbApiKey = config.SteamGridDbApiKey;
+            _config.InstalledGamesPath = config.InstalledGamesPath;
+            return Task.FromResult(_config != null
+                ? Prelude.Right<ErrorBase, ConfigModel>(_config)
                 : Prelude.Left<ErrorBase, ConfigModel>(new ErrorNotFound()));
         }
 
         public Task<Either<ErrorBase, Unit>> SetConfig(ConfigModel config)
         {
-            SaveToFile(config);
+            _config.SteamUserId = config.SteamUserId;
+            _config.SteamPath = config.SteamPath;
+            _config.SteamGridDbApiKey = config.SteamGridDbApiKey;
+            _config.InstalledGamesPath = config.InstalledGamesPath;
+            SaveToFile(_config);
             return Task.FromResult(Prelude.Right<ErrorBase, Unit>(Unit.Default));
         }
 

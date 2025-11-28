@@ -25,9 +25,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddGrpc();
 builder.Services.AddGrpcReflection();
 
-var configRepository = new ConfigRepository();
-var config = configRepository.GetConfig().Result.Match(
-    Right: cfg => cfg,
+var config = new RetroGate.SDK.Core.Domain.Models.ConfigModel();
+var configRepository = new ConfigRepository(config);
+configRepository.GetConfig().Result.Match(
+    Right: cfg =>
+    {
+        config.SteamPath = cfg.SteamPath;
+        config.SteamUserId = cfg.SteamUserId;
+        config.SteamGridDbApiKey = cfg.SteamGridDbApiKey;
+        config.InstalledGamesPath = cfg.InstalledGamesPath;
+    },
     Left: _ => new RetroGate.SDK.Core.Domain.Models.ConfigModel()
 );
 builder.Services.AddSingleton(config);
@@ -69,7 +76,7 @@ builder.Services.AddSingleton<ICancelInstallation, CancelInstallation>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-app.MapGrpcService<ConfigService>();
+app.MapGrpcService<RetroGate.Grpc.Services.ConfigService>();
 app.MapGrpcService<ShortcutService>();
 app.MapGrpcService<GameService>();
 app.MapGrpcService<InstallerService>();

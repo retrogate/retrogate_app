@@ -24,6 +24,7 @@ class _ConfigPageState extends State<ConfigPage> with SingleTickerProviderStateM
   final _steamPathController = TextEditingController();
   final _steamUserIdController = TextEditingController();
   final _steamGridDbApiKeyController = TextEditingController();
+  final _installedGamesPathController = TextEditingController();
   
   late TabController _tabController;
   bool _hasRegisteredActions = false;
@@ -113,6 +114,7 @@ class _ConfigPageState extends State<ConfigPage> with SingleTickerProviderStateM
     _steamPathController.dispose();
     _steamUserIdController.dispose();
     _steamGridDbApiKeyController.dispose();
+    _installedGamesPathController.dispose();
     super.dispose();
   }
 
@@ -122,6 +124,7 @@ class _ConfigPageState extends State<ConfigPage> with SingleTickerProviderStateM
         steamPath: _steamPathController.text,
         steamUserId: _steamUserIdController.text,
         steamGridDbApiKey: _steamGridDbApiKeyController.text,
+        installedGamesPath: _installedGamesPathController.text,
       );
 
       BlocProvider.of<ConfigBloc>(context).add(SaveConfig(config));
@@ -207,6 +210,7 @@ class _ConfigPageState extends State<ConfigPage> with SingleTickerProviderStateM
               _steamPathController.text = config.steamPath;
               _steamUserIdController.text = config.steamUserId;
               _steamGridDbApiKeyController.text = config.steamGridDbApiKey;
+              _installedGamesPathController.text = config.installedGamesPath;
             }
           }
 
@@ -327,6 +331,21 @@ class _ConfigPageState extends State<ConfigPage> with SingleTickerProviderStateM
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter SteamGridDB API Key';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 24),
+            
+            // Installed Games Path
+            _buildTextField(
+              controller: _installedGamesPathController,
+              label: 'Installed Games Path',
+              hint: 'C:\\RetroGate\\Games',
+              icon: Icons.folder_special,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter installed games path';
                 }
                 return null;
               },

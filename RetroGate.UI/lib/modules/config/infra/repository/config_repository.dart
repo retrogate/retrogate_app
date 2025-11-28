@@ -36,6 +36,7 @@ class ConfigRepository implements IConfigRepository {
       steamPath: model.steamPath,
       steamUserId: model.steamUserId,
       steamGridDbApiKey: model.steamGridDbApiKey,
+      installedGamesPath: model.installedGamesPath,
     );
   }
 
@@ -44,6 +45,7 @@ class ConfigRepository implements IConfigRepository {
       steamPath: entity.steamPath,
       steamUserId: entity.steamUserId,
       steamGridDbApiKey: entity.steamGridDbApiKey,
+      installedGamesPath: entity.installedGamesPath,
     );
   }
 }
