@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:retrogate_ui/modules/game/domain/models/game.dart';
 import 'package:retrogate_ui/modules/game/domain/models/game_source.dart';
+import 'package:retrogate_ui/modules/game/domain/usecases/delete_game_usecase.dart';
 import 'package:retrogate_ui/modules/game/domain/usecases/launch_game_usecase.dart';
 import '../../domain/usecases/get_all_games_usecase.dart';
 import '../../domain/usecases/create_game_usecase.dart';
@@ -13,6 +14,7 @@ class GamesBloc extends Bloc<GamesEvent, GamesState> {
   final CreateGameUseCase createGameUseCase;
   final GetGameImagesUseCase getGameImagesUseCase;
   final LaunchGameUseCase launchGameUseCase;
+  final DeleteGameUseCase deleteGameUseCase;
 
   final Map<GameSource, List<Game>> _gamesCache = {};
 
@@ -21,12 +23,14 @@ class GamesBloc extends Bloc<GamesEvent, GamesState> {
     required this.createGameUseCase,
     required this.getGameImagesUseCase,
     required this.launchGameUseCase,
+    required this.deleteGameUseCase,
   }) : super(const GamesInitialState()) {
     on<LoadGamesEvent>(_onLoadGames);
     on<RefreshGamesEvent>(_onRefreshGames);
     on<CreateGameEvent>(_onCreateGame);
     on<LoadGameImagesEvent>(_onLoadGameImages);
     on<LaunchGameEvent>(_onLaunchGame);
+    on<DeleteGameEvent>(_onDeleteGame);
   }
 
   Future<void> _onLoadGames(LoadGamesEvent event, Emitter<GamesState> emit) async {
@@ -92,6 +96,19 @@ class GamesBloc extends Bloc<GamesEvent, GamesState> {
     } catch (error) {
       emit(GamesErrorState('Failed to launch game: ${error.toString()}'));
     }
+  }
+
+  Future<void> _onDeleteGame(DeleteGameEvent event, Emitter<GamesState> emit) async {
+    final result = await deleteGameUseCase(GameSource.available, event.gameId);
+
+    result.fold(
+      (error) {
+        emit(GamesErrorState(error.toString()));
+      },
+      (_) {
+        add(LoadGamesEvent(GameSource.available));
+      },
+    );
   }
 
   Future<void> _fetchGames(GameSource source, Emitter<GamesState> emit) async {
