@@ -1,5 +1,6 @@
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:retrogate_ui/modules/game/domain/usecases/launch_game_usecase.dart';
+import 'package:retrogate_ui/modules/installer/domain/usecases/get_pending_installations.dart';
 import 'domain/repositories/available_games_repository.dart';
 import 'domain/repositories/installed_games_repository.dart';
 import 'domain/usecases/get_all_games_usecase.dart';
@@ -42,6 +43,7 @@ class GameModule extends Module {
       () => GetAllGamesUseCase(
         availableGamesRepository: i.get<IAvailableGamesRepository>(),
         installedGamesRepository: i.get<IInstalledGamesRepository>(),
+        getPendingInstallations: Modular.get<GetPendingInstallations>(),
       ),
     );
     
