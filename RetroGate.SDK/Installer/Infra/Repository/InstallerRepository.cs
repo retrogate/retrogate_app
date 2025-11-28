@@ -11,6 +11,7 @@ using RetroGate.SDK.Shortcut.Domain.Usecases;
 using System.Collections.Concurrent;
 using SharpCompress.Archives;
 using SharpCompress.Common;
+using SharpCompress.Readers;
 
 namespace RetroGate.SDK.Installer.Infra.Repository
 {
@@ -81,6 +82,7 @@ namespace RetroGate.SDK.Installer.Infra.Repository
                 if (_pendingInstallations.Any(p => p.GameId == gameId))
                 {
                     Console.WriteLine($"[Installer] Instalação do jogo {gameId} já está na fila");
+                    ReportProgress(gameId, InstallerProgressState.Pending, 0, 0);
                     return new ErrorAlreadyExists();
                 }
             }
@@ -178,7 +180,7 @@ namespace RetroGate.SDK.Installer.Infra.Repository
                     ReportProgress(gameId, InstallerProgressState.Downloading, 0, 0);
 
                     // Baixa o arquivo
-                    var downloadPath = await DownloadGame(game, cts.Token);
+                    var downloadPath = await DownloadGame(game, replace, cts.Token);
                     Console.WriteLine($"[Installer] Download concluído: {downloadPath}");
 
                     var finalInstallPath = await InstallGame(game, downloadPath, cts.Token);
@@ -277,6 +279,28 @@ namespace RetroGate.SDK.Installer.Infra.Repository
                     return Unit.Default;
                 }
 
+                if (_pendingInstallations.Any(p => p.GameId == id))
+                {
+                    Console.WriteLine($"[Installer] Removendo instalação pendente da fila: {id}");
+                    lock (_pendingInstallations)
+                    {
+                        var pendingList = _pendingInstallations.ToList();
+                        var toRemove = pendingList.Where(p => p.GameId == id).ToList();
+                        foreach (var item in toRemove)
+                        {
+                            pendingList.Remove(item);
+                        }
+                        _pendingInstallations.Clear();
+                        foreach (var item in pendingList)
+                        {
+                            _pendingInstallations.Enqueue(item);
+                        }
+                    }
+                    ReportProgress(id, InstallerProgressState.Cancelled, 0, 0);
+                    
+                    return Unit.Default;
+                }
+
                 Console.WriteLine($"[Installer] Nenhuma instalação ativa encontrada para: {id}");
                 return new ErrorNotFound { Message = "Nenhuma instalação ativa encontrada" };
             }
@@ -289,11 +313,21 @@ namespace RetroGate.SDK.Installer.Infra.Repository
 
         private async Task<string> DownloadGame(
             Game.Domain.Models.GameModel game,
+            bool replace,
             CancellationToken cancellationToken)
         {
             var downloadPath = Path.Combine(
                 Path.GetTempPath(),
                 $"{game.Id}.zip");
+
+            // Se o arquivo já existe e replace é false, retorna o caminho sem baixar novamente
+            if (File.Exists(downloadPath) && !replace)
+            {
+                Console.WriteLine($"[Installer] Arquivo já existe: {downloadPath}");
+                Console.WriteLine($"[Installer] Pulando download (use replace=true para baixar novamente)");
+                ReportProgress(game.Id, InstallerProgressState.Downloading, 100, 0);
+                return downloadPath;
+            }
 
             Console.WriteLine($"[Installer] Baixando de: {game.DownloadUrl}");
             Console.WriteLine($"[Installer] Salvando em: {downloadPath}");
@@ -387,29 +421,33 @@ namespace RetroGate.SDK.Installer.Infra.Repository
                 var totalEntries = archive.Entries.Count(e => !e.IsDirectory);
                 var extractedEntries = 0;
 
-                foreach (var entry in archive.Entries.Where(e => !e.IsDirectory))
+                var reader = archive.ExtractAllEntries();
+                while (reader.MoveToNextEntry())
                 {
                     cancellationToken.ThrowIfCancellationRequested();
 
-                    entry.WriteToDirectory(extractPath, new ExtractionOptions
+                    if (!reader.Entry.IsDirectory)
                     {
-                        ExtractFullPath = true,
-                        Overwrite = true
-                    });
+                        reader.WriteEntryToDirectory(extractPath, new ExtractionOptions
+                        {
+                            ExtractFullPath = true,
+                            Overwrite = true
+                        });
 
-                    // Incrementa o contador após extrair cada arquivo
-                    extractedEntries++;
+                        // Incrementa o contador após extrair cada arquivo
+                        extractedEntries++;
 
-                    // Reporta progresso a cada 500ms OU a cada 5% de progresso
-                    var now = DateTime.Now;
-                    var percentage = (extractedEntries * 100) / totalEntries;
-                    var shouldReport = (now - lastReportTime).TotalMilliseconds > 500 ||
-                                      (percentage % 5 == 0 && percentage > 0);
+                        // Reporta progresso a cada 500ms OU a cada 5% de progresso
+                        var now = DateTime.Now;
+                        var percentage = totalEntries > 0 ? (extractedEntries * 100) / totalEntries : 0;
+                        var shouldReport = (now - lastReportTime).TotalMilliseconds > 500 ||
+                                          (percentage % 5 == 0 && percentage > 0);
 
-                    if (shouldReport)
-                    {
-                        ReportProgress(game.Id, InstallerProgressState.Extracting, percentage, 0);
-                        lastReportTime = now;
+                        if (shouldReport)
+                        {
+                            ReportProgress(game.Id, InstallerProgressState.Extracting, percentage, 0);
+                            lastReportTime = now;
+                        }
                     }
                 }
 
