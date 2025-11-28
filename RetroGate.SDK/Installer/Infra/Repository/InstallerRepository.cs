@@ -661,5 +661,14 @@ namespace RetroGate.SDK.Installer.Infra.Repository
                 });
             }
         }
+
+        public Task<Either<ErrorBase, List<string>>> GetPendingInstallations()
+        {
+            lock (_pendingInstallations)
+            {
+                var pendingIds = _pendingInstallations.Select(p => p.GameId).ToList();
+                return Task.FromResult<Either<ErrorBase, List<string>>>(pendingIds);
+            }
+        }
     }
 }
