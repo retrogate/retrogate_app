@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:retrogate_ui/modules/installer/domain/usecases/get_pending_installations.dart';
 import 'package:retrogate_ui/modules/installer/domain/usecases/uninstall_game_usecase.dart';
 import '../../domain/models/installer_progress.dart';
 import '../../domain/usecases/install_game_usecase.dart';
@@ -13,6 +14,7 @@ class InstallerBloc extends Bloc<InstallerEvent, InstallerState> {
   final InstallGameUseCase installGameUseCase;
   final CancelInstallationUseCase cancelInstallationUseCase;
   final UninstallGameUseCase uninstallGameUseCase;
+  final GetPendingInstallations getPendingInstallations;
 
   StreamSubscription? _progressSubscription;
 
@@ -21,6 +23,7 @@ class InstallerBloc extends Bloc<InstallerEvent, InstallerState> {
     required this.installGameUseCase,
     required this.cancelInstallationUseCase,
     required this.uninstallGameUseCase,
+    required this.getPendingInstallations,
   }) : super(const InstallerInitialState()) {
     on<SubscribeToProgressEvent>(_onSubscribeToProgress);
     on<ProgressUpdatedEvent>(_onProgressUpdated);
