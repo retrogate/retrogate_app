@@ -4,6 +4,7 @@ import 'package:flutter_modular/flutter_modular.dart';
 import '../../../core/widgets/gamepad_focusable.dart';
 import '../../../core/widgets/gamepad_navigation_scope.dart';
 import '../../../core/widgets/app_drawer.dart';
+import '../../../core/widgets/confirm_dialog.dart';
 import '../../installer/domain/models/installer_progress.dart';
 import '../../installer/presentation/bloc/installer_bloc.dart';
 import '../../installer/presentation/bloc/installer_event.dart';
@@ -627,7 +628,7 @@ class _GameTabContentState extends State<_GameTabContent> with AutomaticKeepAliv
     });
   }
 
-  void _handleMenuAction(GameContextMenuAction action, Game game) {
+  void _handleMenuAction(GameContextMenuAction action, Game game) async {
     switch (action) {
       case GameContextMenuAction.install:
         final installerBloc = Modular.get<InstallerBloc>();
@@ -639,14 +640,8 @@ class _GameTabContentState extends State<_GameTabContent> with AutomaticKeepAliv
         break;
 
       case GameContextMenuAction.cancelInstallation:
-        // TODO: Implementar cancelamento de instalação
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Cancel installation: ${game.name}'),
-            backgroundColor: const Color(0xFFD32F2F),
-            duration: const Duration(seconds: 2),
-          ),
-        );
+        final installerBloc = Modular.get<InstallerBloc>();
+        installerBloc.add(CancelInstallationEvent(game.id));
         break;
 
       case GameContextMenuAction.uninstall:
@@ -685,6 +680,10 @@ class _GameTabContentState extends State<_GameTabContent> with AutomaticKeepAliv
             duration: const Duration(seconds: 2),
           ),
         );
+        break;
+
+      case GameContextMenuAction.delete:
+        BlocProvider.of<GamesBloc>(context).add(DeleteGameEvent(game.id));
         break;
     }
   }
