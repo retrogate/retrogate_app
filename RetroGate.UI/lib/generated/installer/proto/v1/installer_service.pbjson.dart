@@ -78,3 +78,16 @@ const SubscribeProgressRequest$json = {
 final $typed_data.Uint8List subscribeProgressRequestDescriptor = $convert.base64Decode(
     'ChhTdWJzY3JpYmVQcm9ncmVzc1JlcXVlc3QSFwoHZ2FtZV9pZBgBIAEoCVIGZ2FtZUlk');
 
+@$core.Deprecated('Use getPendingInstallationsResponseDescriptor instead')
+const GetPendingInstallationsResponse$json = {
+  '1': 'GetPendingInstallationsResponse',
+  '2': [
+    {'1': 'game_ids', '3': 1, '4': 3, '5': 9, '10': 'gameIds'},
+  ],
+};
+
+/// Descriptor for `GetPendingInstallationsResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getPendingInstallationsResponseDescriptor = $convert.base64Decode(
+    'Ch9HZXRQZW5kaW5nSW5zdGFsbGF0aW9uc1Jlc3BvbnNlEhkKCGdhbWVfaWRzGAEgAygJUgdnYW'
+    '1lSWRz');
+

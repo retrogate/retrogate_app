@@ -39,6 +39,10 @@ class InstallerServiceClient extends $grpc.Client {
       '/installer.proto.v1.InstallerService/SubscribeEvents',
       ($1.Empty value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $2.InstallerEventModel.fromBuffer(value));
+  static final _$getPendingInstallations = $grpc.ClientMethod<$1.Empty, $0.GetPendingInstallationsResponse>(
+      '/installer.proto.v1.InstallerService/GetPendingInstallations',
+      ($1.Empty value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $0.GetPendingInstallationsResponse.fromBuffer(value));
 
   InstallerServiceClient($grpc.ClientChannel channel,
       {$grpc.CallOptions? options,
@@ -60,6 +64,10 @@ class InstallerServiceClient extends $grpc.Client {
 
   $grpc.ResponseStream<$2.InstallerEventModel> subscribeEvents($1.Empty request, {$grpc.CallOptions? options}) {
     return $createStreamingCall(_$subscribeEvents, $async.Stream.fromIterable([request]), options: options);
+  }
+
+  $grpc.ResponseFuture<$0.GetPendingInstallationsResponse> getPendingInstallations($1.Empty request, {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$getPendingInstallations, request, options: options);
   }
 }
 
@@ -96,6 +104,13 @@ abstract class InstallerServiceBase extends $grpc.Service {
         true,
         ($core.List<$core.int> value) => $1.Empty.fromBuffer(value),
         ($2.InstallerEventModel value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$1.Empty, $0.GetPendingInstallationsResponse>(
+        'GetPendingInstallations',
+        getPendingInstallations_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $1.Empty.fromBuffer(value),
+        ($0.GetPendingInstallationsResponse value) => value.writeToBuffer()));
   }
 
   $async.Future<$0.InstallResponse> install_Pre($grpc.ServiceCall call, $async.Future<$0.InstallRequest> request) async {
@@ -114,8 +129,13 @@ abstract class InstallerServiceBase extends $grpc.Service {
     yield* subscribeEvents(call, await request);
   }
 
+  $async.Future<$0.GetPendingInstallationsResponse> getPendingInstallations_Pre($grpc.ServiceCall call, $async.Future<$1.Empty> request) async {
+    return getPendingInstallations(call, await request);
+  }
+
   $async.Future<$0.InstallResponse> install($grpc.ServiceCall call, $0.InstallRequest request);
   $async.Future<$1.Empty> uninstall($grpc.ServiceCall call, $0.UninstallRequest request);
   $async.Future<$1.Empty> cancel($grpc.ServiceCall call, $0.CancelRequest request);
   $async.Stream<$2.InstallerEventModel> subscribeEvents($grpc.ServiceCall call, $1.Empty request);
+  $async.Future<$0.GetPendingInstallationsResponse> getPendingInstallations($grpc.ServiceCall call, $1.Empty request);
 }

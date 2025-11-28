@@ -305,6 +305,50 @@ class SubscribeProgressRequest extends $pb.GeneratedMessage {
   void clearGameId() => clearField(1);
 }
 
+class GetPendingInstallationsResponse extends $pb.GeneratedMessage {
+  factory GetPendingInstallationsResponse({
+    $core.Iterable<$core.String>? gameIds,
+  }) {
+    final $result = create();
+    if (gameIds != null) {
+      $result.gameIds.addAll(gameIds);
+    }
+    return $result;
+  }
+  GetPendingInstallationsResponse._() : super();
+  factory GetPendingInstallationsResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory GetPendingInstallationsResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'GetPendingInstallationsResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'installer.proto.v1'), createEmptyInstance: create)
+    ..pPS(1, _omitFieldNames ? '' : 'gameIds')
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  GetPendingInstallationsResponse clone() => GetPendingInstallationsResponse()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  GetPendingInstallationsResponse copyWith(void Function(GetPendingInstallationsResponse) updates) => super.copyWith((message) => updates(message as GetPendingInstallationsResponse)) as GetPendingInstallationsResponse;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static GetPendingInstallationsResponse create() => GetPendingInstallationsResponse._();
+  GetPendingInstallationsResponse createEmptyInstance() => create();
+  static $pb.PbList<GetPendingInstallationsResponse> createRepeated() => $pb.PbList<GetPendingInstallationsResponse>();
+  @$core.pragma('dart2js:noInline')
+  static GetPendingInstallationsResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<GetPendingInstallationsResponse>(create);
+  static GetPendingInstallationsResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.List<$core.String> get gameIds => $_getList(0);
+}
+
 
 const _omitFieldNames = $core.bool.fromEnvironment('protobuf.omit_field_names');
 const _omitMessageNames = $core.bool.fromEnvironment('protobuf.omit_message_names');
