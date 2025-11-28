@@ -65,10 +65,30 @@ class InstallerBloc extends Bloc<InstallerEvent, InstallerState> {
         ? Map<String, InstallerProgress>.from(currentState.progressMap)
         : <String, InstallerProgress>{};
     
-    // Update or add progress for this game
-    progressMap[event.progress.gameId] = event.progress;
+    final pendingGameIds = currentState is InstallerDataState
+        ? Set<String>.from(currentState.pendingGameIds)
+        : <String>{};
     
-    emit(InstallerDataState(progressMap));
+    final gameId = event.progress.gameId;
+    final newState = event.progress.state;
+    
+    // Update or add progress for this game
+    progressMap[gameId] = event.progress;
+    
+    // Gerencia o set de pendentes
+    if (newState == InstallerProgressState.pending) {
+      // Adiciona à lista de pendentes
+      pendingGameIds.add(gameId);
+    } else if (newState == InstallerProgressState.downloading ||
+               newState == InstallerProgressState.extracting ||
+               newState == InstallerProgressState.completed ||
+               newState == InstallerProgressState.failed ||
+               newState == InstallerProgressState.cancelled) {
+      // Remove da lista de pendentes quando sai do estado pending
+      pendingGameIds.remove(gameId);
+    }
+    
+    emit(InstallerDataState(progressMap, pendingGameIds));
   }
 
   Future<void> _onInstallGame(

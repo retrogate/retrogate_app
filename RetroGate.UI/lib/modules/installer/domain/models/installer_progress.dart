@@ -94,10 +94,13 @@ class InstallerProgress {
   }
 
   bool get isInProgress {
-    return state == InstallerProgressState.downloading ||
+    return state == InstallerProgressState.pending ||
+        state == InstallerProgressState.downloading ||
         state == InstallerProgressState.extracting ||
         state == InstallerProgressState.creatingShortcut;
   }
+
+  bool get isPending => state == InstallerProgressState.pending;
 
   bool get isCompleted => state == InstallerProgressState.completed;
   bool get isFailed => state == InstallerProgressState.failed;

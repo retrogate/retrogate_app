@@ -8,6 +8,7 @@ class GameCard extends StatefulWidget {
   final int index;
   final VoidCallback? onTap;
   final InstallerProgress? installProgress;
+  final bool isPending;
 
   const GameCard({
     super.key,
@@ -15,6 +16,7 @@ class GameCard extends StatefulWidget {
     required this.index,
     this.onTap,
     this.installProgress,
+    this.isPending = false,
   });
 
   @override
@@ -121,6 +123,9 @@ class _GameCardState extends State<GameCard> {
                   // Installation progress overlay
                   if (widget.installProgress != null && widget.installProgress!.isInProgress)
                     _buildProgressOverlay(),
+                  // Pending overlay
+                  if (widget.isPending)
+                    _buildPendingOverlay(),
                   // Installation status badge (subtle, always visible)
                   Positioned(
                     top: 8,
@@ -241,6 +246,15 @@ class _GameCardState extends State<GameCard> {
   }
 
   Widget _buildCenterIcon() {
+    // If pending, show clock icon
+    if (widget.isPending) {
+      return const Icon(
+        Icons.schedule,
+        color: Colors.orange,
+        size: 32,
+      );
+    }
+    
     // If installing, show spinner
     if (widget.installProgress != null && widget.installProgress!.isInProgress) {
       return const CircularProgressIndicator(
@@ -312,6 +326,42 @@ class _GameCardState extends State<GameCard> {
                   fontSize: 12,
                 ),
               ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPendingOverlay() {
+    return Positioned.fill(
+      child: Container(
+        color: Colors.black.withValues(alpha: 0.75),
+        child: const Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.schedule,
+              color: Colors.orange,
+              size: 48,
+            ),
+            SizedBox(height: 12),
+            Text(
+              'IN QUEUE',
+              style: TextStyle(
+                color: Colors.orange,
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.5,
+              ),
+            ),
+            SizedBox(height: 4),
+            Text(
+              'Waiting for installation...',
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 12,
+              ),
+            ),
           ],
         ),
       ),

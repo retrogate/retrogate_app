@@ -14,11 +14,12 @@ class InstallerInitialState extends InstallerState {
 
 class InstallerDataState extends InstallerState {
   final Map<String, InstallerProgress> progressMap;
+  final Set<String> pendingGameIds;
 
-  const InstallerDataState(this.progressMap);
+  const InstallerDataState(this.progressMap, [this.pendingGameIds = const {}]);
 
   @override
-  List<Object?> get props => [progressMap];
+  List<Object?> get props => [progressMap, pendingGameIds];
 
   InstallerProgress? getProgress(String gameId) => progressMap[gameId];
   
@@ -26,9 +27,17 @@ class InstallerDataState extends InstallerState {
     final progress = progressMap[gameId];
     return progress != null && progress.isInProgress;
   }
+  
+  bool isPending(String gameId) => pendingGameIds.contains(gameId);
 
-  InstallerDataState copyWith(Map<String, InstallerProgress>? progressMap) {
-    return InstallerDataState(progressMap ?? this.progressMap);
+  InstallerDataState copyWith({
+    Map<String, InstallerProgress>? progressMap,
+    Set<String>? pendingGameIds,
+  }) {
+    return InstallerDataState(
+      progressMap ?? this.progressMap,
+      pendingGameIds ?? this.pendingGameIds,
+    );
   }
 }
 
