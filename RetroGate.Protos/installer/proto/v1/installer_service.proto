@@ -12,6 +12,7 @@ service InstallerService {
     rpc Uninstall(UninstallRequest) returns (google.protobuf.Empty);
     rpc Cancel(CancelRequest) returns (google.protobuf.Empty);
     rpc SubscribeEvents(google.protobuf.Empty) returns (stream InstallerEventModel);
+    rpc GetPendingInstallations(google.protobuf.Empty) returns (GetPendingInstallationsResponse);
 }
 
 message InstallRequest {
@@ -35,4 +36,8 @@ message CancelRequest {
 
 message SubscribeProgressRequest {
     string game_id = 1;
+}
+
+message GetPendingInstallationsResponse {
+    repeated string game_ids = 1;
 }
