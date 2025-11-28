@@ -1,4 +1,5 @@
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:retrogate_ui/modules/installer/domain/usecases/get_pending_installations.dart';
 import 'modules/game/game_module.dart';
 import 'modules/config/config_module.dart';
 import 'modules/installer/domain/repositories/installer_repository.dart';
@@ -43,6 +44,10 @@ class AppModule extends Module {
       () => UninstallGameUseCase(i.get<InstallerRepository>()),
     );
 
+    i.addLazySingleton<GetPendingInstallations>(
+      () => GetPendingInstallations(i.get<InstallerRepository>()),
+    );
+
     // Global InstallerBloc (singleton - starts on app init)
     i.addSingleton<InstallerBloc>(
       () => InstallerBloc(
@@ -50,6 +55,7 @@ class AppModule extends Module {
         installGameUseCase: i.get<InstallGameUseCase>(),
         cancelInstallationUseCase: i.get<CancelInstallationUseCase>(),
         uninstallGameUseCase: i.get<UninstallGameUseCase>(),
+        getPendingInstallations: i.get<GetPendingInstallations>(),
       ),
     );
   }
