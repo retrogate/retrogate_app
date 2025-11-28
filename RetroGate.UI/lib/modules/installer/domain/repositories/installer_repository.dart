@@ -16,4 +16,7 @@ abstract class InstallerRepository {
 
   /// Subscribe to installation progress events
   Stream<InstallerProgress> subscribeToProgress();
+
+  /// Get list of pending installations
+  Future<List<String>> getPendingInstallations();
 }
