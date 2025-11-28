@@ -49,6 +49,16 @@ class InstallerGrpcDataSource {
   //   }
   // }
 
+  Future<List<String>> getPendingInstallations() async {
+    try {
+      final request = Empty();
+      final response = await _client.getPendingInstallations(request);
+      return response.gameIds;
+    } catch (e) {
+      throw Exception('Failed to get pending installations: $e');
+    }
+  }
+
   Future<void> uninstall({
     required String gameId,
     bool restartSteam = false,
