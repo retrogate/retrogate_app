@@ -14,6 +14,7 @@ namespace RetroGate.Grpc.Services
         IUninstallGame uninstallGame,
         ICancelInstallation cancelInstallation,
         IInstallerRepository installerRepository,
+        IGetPendingInstallations getPendingInstallations,
         ConcurrentDictionary<string, Subscriber<SDK.Installer.Domain.Models.InstallerEventModel>> subscribers
     ) : Protos.Installer.Proto.V1.InstallerService.InstallerServiceBase
     {
@@ -100,6 +101,19 @@ namespace RetroGate.Grpc.Services
                     installerRepository.OnInstallerEvent -= InstallerRepository_OnInstallerEvent;
                 }
             }
+        }
+
+        public override async Task<GetPendingInstallationsResponse> GetPendingInstallations(Empty request, ServerCallContext context)
+        {
+            var result = await getPendingInstallations.Call();
+            
+            return result.Match(
+                Right: pendingIds => new GetPendingInstallationsResponse
+                {
+                    GameIds = { pendingIds }
+                },
+                Left: error => throw new RpcException(new Status(StatusCode.Internal, error.Message))
+            );
         }
 
         public void InstallerRepository_OnInstallerEvent(object? sender, SDK.Installer.Domain.Models.InstallerEventModel e)
