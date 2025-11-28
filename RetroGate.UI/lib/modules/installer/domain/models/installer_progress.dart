@@ -1,6 +1,7 @@
 enum InstallerProgressState {
   idle,
   downloading,
+  pending,
   extracting,
   creatingShortcut,
   paused,
@@ -32,18 +33,20 @@ class InstallerProgress {
         case 1:
           return InstallerProgressState.downloading;
         case 2:
-          return InstallerProgressState.extracting;
+          return InstallerProgressState.pending;
         case 3:
-          return InstallerProgressState.creatingShortcut;
+          return InstallerProgressState.extracting;
         case 4:
-          return InstallerProgressState.paused;
+          return InstallerProgressState.creatingShortcut;
         case 5:
-          return InstallerProgressState.completed;
+          return InstallerProgressState.paused;
         case 6:
-          return InstallerProgressState.failed;
+          return InstallerProgressState.completed;
         case 7:
-          return InstallerProgressState.cancelled;
+          return InstallerProgressState.failed;
         case 8:
+          return InstallerProgressState.cancelled;
+        case 9:
           return InstallerProgressState.uninstalled;
         default:
           return InstallerProgressState.idle;
@@ -64,6 +67,8 @@ class InstallerProgress {
         return 'Idle';
       case InstallerProgressState.downloading:
         return 'Downloading';
+      case InstallerProgressState.pending:
+        return 'Pending';
       case InstallerProgressState.extracting:
         return 'Extracting';
       case InstallerProgressState.creatingShortcut:

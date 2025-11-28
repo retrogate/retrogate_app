@@ -62,6 +62,7 @@ namespace RetroGate.Grpc.Extensions
             {
                 SDK.Installer.Domain.Models.InstallerProgressState.Idle => InstallerProgressState.Idle,
                 SDK.Installer.Domain.Models.InstallerProgressState.Downloading => InstallerProgressState.Downloading,
+                SDK.Installer.Domain.Models.InstallerProgressState.Pending => InstallerProgressState.Pending,
                 SDK.Installer.Domain.Models.InstallerProgressState.Extracting => InstallerProgressState.Extracting,
                 SDK.Installer.Domain.Models.InstallerProgressState.CreatingShortcut => InstallerProgressState.CreatingShortcut,
                 SDK.Installer.Domain.Models.InstallerProgressState.Paused => InstallerProgressState.Paused,
@@ -79,6 +80,7 @@ namespace RetroGate.Grpc.Extensions
             {
                 InstallerProgressState.Idle => SDK.Installer.Domain.Models.InstallerProgressState.Idle,
                 InstallerProgressState.Downloading => SDK.Installer.Domain.Models.InstallerProgressState.Downloading,
+                InstallerProgressState.Pending => SDK.Installer.Domain.Models.InstallerProgressState.Pending,
                 InstallerProgressState.Extracting => SDK.Installer.Domain.Models.InstallerProgressState.Extracting,
                 InstallerProgressState.CreatingShortcut => SDK.Installer.Domain.Models.InstallerProgressState.CreatingShortcut,
                 InstallerProgressState.Paused => SDK.Installer.Domain.Models.InstallerProgressState.Paused,

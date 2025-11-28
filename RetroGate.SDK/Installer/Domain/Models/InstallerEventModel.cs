@@ -4,6 +4,7 @@ namespace RetroGate.SDK.Installer.Domain.Models
     {
         Idle,
         Downloading,
+        Pending,
         Extracting,
         CreatingShortcut,
         Paused,

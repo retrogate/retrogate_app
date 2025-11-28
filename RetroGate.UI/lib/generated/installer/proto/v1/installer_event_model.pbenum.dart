@@ -16,17 +16,19 @@ import 'package:protobuf/protobuf.dart' as $pb;
 class InstallerProgressState extends $pb.ProtobufEnum {
   static const InstallerProgressState INSTALLER_PROGRESS_STATE_IDLE = InstallerProgressState._(0, _omitEnumNames ? '' : 'INSTALLER_PROGRESS_STATE_IDLE');
   static const InstallerProgressState INSTALLER_PROGRESS_STATE_DOWNLOADING = InstallerProgressState._(1, _omitEnumNames ? '' : 'INSTALLER_PROGRESS_STATE_DOWNLOADING');
-  static const InstallerProgressState INSTALLER_PROGRESS_STATE_EXTRACTING = InstallerProgressState._(2, _omitEnumNames ? '' : 'INSTALLER_PROGRESS_STATE_EXTRACTING');
-  static const InstallerProgressState INSTALLER_PROGRESS_STATE_CREATING_SHORTCUT = InstallerProgressState._(3, _omitEnumNames ? '' : 'INSTALLER_PROGRESS_STATE_CREATING_SHORTCUT');
-  static const InstallerProgressState INSTALLER_PROGRESS_STATE_PAUSED = InstallerProgressState._(4, _omitEnumNames ? '' : 'INSTALLER_PROGRESS_STATE_PAUSED');
-  static const InstallerProgressState INSTALLER_PROGRESS_STATE_COMPLETED = InstallerProgressState._(5, _omitEnumNames ? '' : 'INSTALLER_PROGRESS_STATE_COMPLETED');
-  static const InstallerProgressState INSTALLER_PROGRESS_STATE_FAILED = InstallerProgressState._(6, _omitEnumNames ? '' : 'INSTALLER_PROGRESS_STATE_FAILED');
-  static const InstallerProgressState INSTALLER_PROGRESS_STATE_CANCELLED = InstallerProgressState._(7, _omitEnumNames ? '' : 'INSTALLER_PROGRESS_STATE_CANCELLED');
-  static const InstallerProgressState INSTALLER_PROGRESS_STATE_UNINSTALLED = InstallerProgressState._(8, _omitEnumNames ? '' : 'INSTALLER_PROGRESS_STATE_UNINSTALLED');
+  static const InstallerProgressState INSTALLER_PROGRESS_STATE_PENDING = InstallerProgressState._(2, _omitEnumNames ? '' : 'INSTALLER_PROGRESS_STATE_PENDING');
+  static const InstallerProgressState INSTALLER_PROGRESS_STATE_EXTRACTING = InstallerProgressState._(3, _omitEnumNames ? '' : 'INSTALLER_PROGRESS_STATE_EXTRACTING');
+  static const InstallerProgressState INSTALLER_PROGRESS_STATE_CREATING_SHORTCUT = InstallerProgressState._(4, _omitEnumNames ? '' : 'INSTALLER_PROGRESS_STATE_CREATING_SHORTCUT');
+  static const InstallerProgressState INSTALLER_PROGRESS_STATE_PAUSED = InstallerProgressState._(5, _omitEnumNames ? '' : 'INSTALLER_PROGRESS_STATE_PAUSED');
+  static const InstallerProgressState INSTALLER_PROGRESS_STATE_COMPLETED = InstallerProgressState._(6, _omitEnumNames ? '' : 'INSTALLER_PROGRESS_STATE_COMPLETED');
+  static const InstallerProgressState INSTALLER_PROGRESS_STATE_FAILED = InstallerProgressState._(7, _omitEnumNames ? '' : 'INSTALLER_PROGRESS_STATE_FAILED');
+  static const InstallerProgressState INSTALLER_PROGRESS_STATE_CANCELLED = InstallerProgressState._(8, _omitEnumNames ? '' : 'INSTALLER_PROGRESS_STATE_CANCELLED');
+  static const InstallerProgressState INSTALLER_PROGRESS_STATE_UNINSTALLED = InstallerProgressState._(9, _omitEnumNames ? '' : 'INSTALLER_PROGRESS_STATE_UNINSTALLED');
 
   static const $core.List<InstallerProgressState> values = <InstallerProgressState> [
     INSTALLER_PROGRESS_STATE_IDLE,
     INSTALLER_PROGRESS_STATE_DOWNLOADING,
+    INSTALLER_PROGRESS_STATE_PENDING,
     INSTALLER_PROGRESS_STATE_EXTRACTING,
     INSTALLER_PROGRESS_STATE_CREATING_SHORTCUT,
     INSTALLER_PROGRESS_STATE_PAUSED,
