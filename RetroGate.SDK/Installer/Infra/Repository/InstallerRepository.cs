@@ -270,6 +270,14 @@ namespace RetroGate.SDK.Installer.Infra.Repository
                 if (_activeTasks.TryGetValue(id, out var cts))
                 {
                     Console.WriteLine($"[Installer] Cancelando instalação: {id}");
+
+                    var gameFolderPath = Path.Combine(_installBasePath, id);
+                    if (Directory.Exists(gameFolderPath))
+                    {
+                        Directory.Delete(gameFolderPath, true);
+                        Console.WriteLine($"[Installer] Diretório de instalação removido após cancelamento");
+                    }
+
                     cts.Cancel();
                     ReportProgress(id, InstallerProgressState.Cancelled, 0, 0);
                     
@@ -332,58 +340,70 @@ namespace RetroGate.SDK.Installer.Infra.Repository
             Console.WriteLine($"[Installer] Baixando de: {game.DownloadUrl}");
             Console.WriteLine($"[Installer] Salvando em: {downloadPath}");
 
-            using var response = await _httpClient.GetAsync(
-                game.DownloadUrl,
-                HttpCompletionOption.ResponseHeadersRead,
-                cancellationToken);
-
-            response.EnsureSuccessStatusCode();
-
-            var totalBytes = response.Content.Headers.ContentLength ?? 0;
-            var downloadedBytes = 0L;
-            var lastReportTime = DateTime.Now;
-            var lastDownloadedBytes = 0L;
-
-            using var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken);
-            using var fileStream = new FileStream(
-                downloadPath,
-                FileMode.Create,
-                FileAccess.Write,
-                FileShare.None,
-                8192,
-                true);
-
-            var buffer = new byte[8192];
-            int bytesRead;
-
-            while ((bytesRead = await contentStream.ReadAsync(buffer, cancellationToken)) > 0)
+            try
             {
-                await fileStream.WriteAsync(buffer.AsMemory(0, bytesRead), cancellationToken);
-                downloadedBytes += bytesRead;
+                using var response = await _httpClient.GetAsync(
+                    game.DownloadUrl,
+                    HttpCompletionOption.ResponseHeadersRead,
+                    cancellationToken);
 
-                // Reporta progresso a cada 500ms
-                var now = DateTime.Now;
-                if ((now - lastReportTime).TotalMilliseconds > 500)
+                response.EnsureSuccessStatusCode();
+
+                var totalBytes = response.Content.Headers.ContentLength ?? 0;
+                var downloadedBytes = 0L;
+                var lastReportTime = DateTime.Now;
+                var lastDownloadedBytes = 0L;
+
+                using var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken);
+                using var fileStream = new FileStream(
+                    downloadPath,
+                    FileMode.Create,
+                    FileAccess.Write,
+                    FileShare.None,
+                    8192,
+                    true);
+
+                var buffer = new byte[8192];
+                int bytesRead;
+
+                while ((bytesRead = await contentStream.ReadAsync(buffer, cancellationToken)) > 0)
                 {
-                    var percentage = totalBytes > 0
-                        ? (int)((downloadedBytes * 100) / totalBytes)
-                        : 0;
+                    await fileStream.WriteAsync(buffer.AsMemory(0, bytesRead), cancellationToken);
+                    downloadedBytes += bytesRead;
 
-                    var bytesInInterval = downloadedBytes - lastDownloadedBytes;
-                    var timeInSeconds = (now - lastReportTime).TotalSeconds;
-                    var speedKbps = timeInSeconds > 0
-                        ? (int)(bytesInInterval / 1024 / timeInSeconds)
-                        : 0;
+                    // Reporta progresso a cada 500ms
+                    var now = DateTime.Now;
+                    if ((now - lastReportTime).TotalMilliseconds > 500)
+                    {
+                        var percentage = totalBytes > 0
+                            ? (int)((downloadedBytes * 100) / totalBytes)
+                            : 0;
 
-                    ReportProgress(game.Id, InstallerProgressState.Downloading, percentage, speedKbps);
+                        var bytesInInterval = downloadedBytes - lastDownloadedBytes;
+                        var timeInSeconds = (now - lastReportTime).TotalSeconds;
+                        var speedKbps = timeInSeconds > 0
+                            ? (int)(bytesInInterval / 1024 / timeInSeconds)
+                            : 0;
 
-                    lastReportTime = now;
-                    lastDownloadedBytes = downloadedBytes;
+                        ReportProgress(game.Id, InstallerProgressState.Downloading, percentage, speedKbps);
+
+                        lastReportTime = now;
+                        lastDownloadedBytes = downloadedBytes;
+                    }
                 }
-            }
 
-            // Reporta 100% do download
-            ReportProgress(game.Id, InstallerProgressState.Downloading, 100, 0);
+                // Reporta 100% do download
+                ReportProgress(game.Id, InstallerProgressState.Downloading, 100, 0);
+            }
+            catch (OperationCanceledException)
+            {
+                if (File.Exists(downloadPath))
+                {
+                    File.Delete(downloadPath);
+                    Console.WriteLine($"[Installer] Arquivo de download removido após cancelamento: {downloadPath}");
+                }
+                throw;
+            }
 
             return downloadPath;
         }
@@ -415,45 +435,57 @@ namespace RetroGate.SDK.Installer.Infra.Repository
 
             var lastReportTime = DateTime.Now;
 
-            await Task.Run(() =>
+            try
             {
-                using var archive = ArchiveFactory.Open(archivePath);
-                var totalEntries = archive.Entries.Count(e => !e.IsDirectory);
-                var extractedEntries = 0;
-
-                var reader = archive.ExtractAllEntries();
-                while (reader.MoveToNextEntry())
+                await Task.Run(() =>
                 {
-                    cancellationToken.ThrowIfCancellationRequested();
+                    using var archive = ArchiveFactory.Open(archivePath);
+                    var totalEntries = archive.Entries.Count(e => !e.IsDirectory);
+                    var extractedEntries = 0;
 
-                    if (!reader.Entry.IsDirectory)
+                    var reader = archive.ExtractAllEntries();
+                    while (reader.MoveToNextEntry())
                     {
-                        reader.WriteEntryToDirectory(extractPath, new ExtractionOptions
+                        cancellationToken.ThrowIfCancellationRequested();
+
+                        if (!reader.Entry.IsDirectory)
                         {
-                            ExtractFullPath = true,
-                            Overwrite = true
-                        });
+                            reader.WriteEntryToDirectory(extractPath, new ExtractionOptions
+                            {
+                                ExtractFullPath = true,
+                                Overwrite = true
+                            });
 
-                        // Incrementa o contador após extrair cada arquivo
-                        extractedEntries++;
+                            // Incrementa o contador após extrair cada arquivo
+                            extractedEntries++;
 
-                        // Reporta progresso a cada 500ms OU a cada 5% de progresso
-                        var now = DateTime.Now;
-                        var percentage = totalEntries > 0 ? (extractedEntries * 100) / totalEntries : 0;
-                        var shouldReport = (now - lastReportTime).TotalMilliseconds > 500 ||
-                                          (percentage % 5 == 0 && percentage > 0);
+                            // Reporta progresso a cada 500ms OU a cada 5% de progresso
+                            var now = DateTime.Now;
+                            var percentage = totalEntries > 0 ? (extractedEntries * 100) / totalEntries : 0;
+                            var shouldReport = (now - lastReportTime).TotalMilliseconds > 500 ||
+                                              (percentage % 5 == 0 && percentage > 0);
 
-                        if (shouldReport)
-                        {
-                            ReportProgress(game.Id, InstallerProgressState.Extracting, percentage, 0);
-                            lastReportTime = now;
+                            if (shouldReport)
+                            {
+                                ReportProgress(game.Id, InstallerProgressState.Extracting, percentage, 0);
+                                lastReportTime = now;
+                            }
                         }
                     }
-                }
 
-                // Garante que reportamos 100% no final
-                ReportProgress(game.Id, InstallerProgressState.Extracting, 100, 0);
-            }, cancellationToken);
+                    // Garante que reportamos 100% no final
+                    ReportProgress(game.Id, InstallerProgressState.Extracting, 100, 0);
+                }, cancellationToken);
+            }
+            catch (OperationCanceledException)
+            {
+                if (Directory.Exists(extractPath))
+                {
+                    Directory.Delete(extractPath, true);
+                    Console.WriteLine($"[Installer] Diretório de extração removido após cancelamento: {extractPath}");
+                }
+                throw;
+            }
 
             return extractPath;
         }
