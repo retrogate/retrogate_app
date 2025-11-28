@@ -72,6 +72,7 @@ builder.Services.AddSingleton<IInstallerRepository, InstallerRepository>();
 builder.Services.AddSingleton<IInstallGame, InstallGame>();
 builder.Services.AddSingleton<IUninstallGame, UninstallGame>();
 builder.Services.AddSingleton<ICancelInstallation, CancelInstallation>();
+builder.Services.AddSingleton<IGetPendingInstallations, GetPendingInstallations>();
 
 var app = builder.Build();
 
