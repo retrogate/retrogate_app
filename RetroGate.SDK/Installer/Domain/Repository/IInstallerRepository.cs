@@ -15,5 +15,7 @@ namespace RetroGate.SDK.Installer.Domain.Repository
         Task<Either<ErrorBase, Unit>> Uninstall(string gameId, bool restartSteam = false);
 
         Task<Either<ErrorBase, Unit>> Cancel(string id);
+
+        Task<Either<ErrorBase, List<string>>> GetPendingInstallations();
     }
 }
