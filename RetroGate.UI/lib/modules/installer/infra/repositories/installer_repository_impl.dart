@@ -156,4 +156,9 @@ class InstallerRepositoryImpl implements InstallerRepository {
     debugPrint('[InstallerRepository] Disposing repository');
     _cleanup();
   }
+  
+  @override
+  Future<List<String>> getPendingInstallations() {
+    return _dataSource.getPendingInstallations();
+  }
 }
