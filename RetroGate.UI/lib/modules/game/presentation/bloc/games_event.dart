@@ -54,3 +54,12 @@ class LaunchGameEvent extends GamesEvent {
   @override
   List<Object?> get props => [gameId];
 }
+
+class DeleteGameEvent extends GamesEvent {
+  final String gameId;
+
+  const DeleteGameEvent(this.gameId);
+
+  @override
+  List<Object?> get props => [gameId];
+}
