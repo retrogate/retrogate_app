@@ -104,11 +104,7 @@ class _GamesGridState extends State<GamesGrid> {
                   final progress = installerState is InstallerDataState
                       ? installerState.getProgress(game.id)
                       : null;
-                  
-                  final isPending = installerState is InstallerDataState
-                      ? installerState.isPending(game.id)
-                      : false;
-                  
+
                   if(progress != null) {
                     game.isInstalled = progress.state == InstallerProgressState.completed;
                   }
@@ -117,7 +113,6 @@ class _GamesGridState extends State<GamesGrid> {
                     game: game,
                     index: index,
                     installProgress: progress,
-                    isPending: isPending,
                     onTap: () {
                       if (widget.onGameSelected != null) {
                         widget.onGameSelected!(game, index);
