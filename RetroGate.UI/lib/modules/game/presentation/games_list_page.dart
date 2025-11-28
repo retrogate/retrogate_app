@@ -4,7 +4,6 @@ import 'package:flutter_modular/flutter_modular.dart';
 import '../../../core/widgets/gamepad_focusable.dart';
 import '../../../core/widgets/gamepad_navigation_scope.dart';
 import '../../../core/widgets/app_drawer.dart';
-import '../../../core/widgets/confirm_dialog.dart';
 import '../../installer/domain/models/installer_progress.dart';
 import '../../installer/presentation/bloc/installer_bloc.dart';
 import '../../installer/presentation/bloc/installer_event.dart';
