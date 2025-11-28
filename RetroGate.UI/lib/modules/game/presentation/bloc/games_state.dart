@@ -25,27 +25,31 @@ class GamesLoadingState extends GamesState {
 
 // New unified state that holds games for all sources
 class GamesDataState extends GamesState {
-  final Map<GameSource, List<Game>> gamesMap;
-  final GameSource? lastLoadedSource;
+  final Map<GameSource, List<Game>> games;
 
-  const GamesDataState(this.gamesMap, [this.lastLoadedSource]);
+  const GamesDataState(this.games);
 
-  List<Game> getGames(GameSource source) => gamesMap[source] ?? [];
-  bool isEmpty(GameSource source) => getGames(source).isEmpty;
-  bool hasData(GameSource source) => gamesMap.containsKey(source);
+  // final Map<GameSource, List<Game>> gamesMap;
+  // final GameSource? lastLoadedSource;
 
-  @override
-  List<Object?> get props => [gamesMap, lastLoadedSource];
+  // const GamesDataState(this.gamesMap, [this.lastLoadedSource]);
 
-  GamesDataState copyWith({
-    Map<GameSource, List<Game>>? gamesMap,
-    GameSource? lastLoadedSource,
-  }) {
-    return GamesDataState(
-      gamesMap ?? this.gamesMap,
-      lastLoadedSource ?? this.lastLoadedSource,
-    );
-  }
+  // List<Game> getGames(GameSource source) => gamesMap[source] ?? [];
+  // bool isEmpty(GameSource source) => getGames(source).isEmpty;
+  // bool hasData(GameSource source) => gamesMap.containsKey(source);
+
+  // @override
+  // List<Object?> get props => [gamesMap, lastLoadedSource];
+
+  // GamesDataState copyWith({
+  //   Map<GameSource, List<Game>>? gamesMap,
+  //   GameSource? lastLoadedSource,
+  // }) {
+  //   return GamesDataState(
+  //     gamesMap ?? this.gamesMap,
+  //     lastLoadedSource ?? this.lastLoadedSource,
+  //   );
+  // }
 }
 
 class GamesErrorState extends GamesState {

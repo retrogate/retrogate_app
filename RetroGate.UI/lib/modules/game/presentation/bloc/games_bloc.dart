@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:retrogate_ui/modules/game/domain/models/game.dart';
 import 'package:retrogate_ui/modules/game/domain/models/game_source.dart';
 import 'package:retrogate_ui/modules/game/domain/usecases/launch_game_usecase.dart';
-import '../../domain/models/game.dart';
 import '../../domain/usecases/get_all_games_usecase.dart';
 import '../../domain/usecases/create_game_usecase.dart';
 import '../../domain/usecases/get_game_images_usecase.dart';
@@ -13,6 +13,8 @@ class GamesBloc extends Bloc<GamesEvent, GamesState> {
   final CreateGameUseCase createGameUseCase;
   final GetGameImagesUseCase getGameImagesUseCase;
   final LaunchGameUseCase launchGameUseCase;
+
+  final Map<GameSource, List<Game>> _gamesCache = {};
 
   GamesBloc({
     required this.getAllGamesUseCase,
@@ -29,26 +31,26 @@ class GamesBloc extends Bloc<GamesEvent, GamesState> {
 
   Future<void> _onLoadGames(LoadGamesEvent event, Emitter<GamesState> emit) async {
     // Get current data state or create new one
-    final currentData = state is GamesDataState 
-        ? (state as GamesDataState) 
-        : const GamesDataState({});
+    // final currentData = state is GamesDataState 
+    //     ? (state as GamesDataState) 
+    //     : const GamesDataState(null);
     
     // If we already have data for this source, don't reload
-    if (currentData.hasData(event.source)) {
-      return;
-    }
+    // if (currentData.hasData(event.source)) {
+    //   return;
+    // }
     
     emit(GamesLoadingState(event.source));
-    await _fetchGames(event.source, emit, currentData);
+    await _fetchGames(event.source, emit);
   }
 
   Future<void> _onRefreshGames(RefreshGamesEvent event, Emitter<GamesState> emit) async {
-    final currentData = state is GamesDataState 
-        ? (state as GamesDataState) 
-        : const GamesDataState({});
+    // final currentData = state is GamesDataState 
+    //     ? (state as GamesDataState) 
+    //     : const GamesDataState({});
     
     emit(GamesLoadingState(event.source));
-    await _fetchGames(event.source, emit, currentData);
+    await _fetchGames(event.source, emit);
   }
 
   Future<void> _onCreateGame(CreateGameEvent event, Emitter<GamesState> emit) async {
@@ -92,19 +94,15 @@ class GamesBloc extends Bloc<GamesEvent, GamesState> {
     }
   }
 
-  Future<void> _fetchGames(GameSource source, Emitter<GamesState> emit, GamesDataState currentData) async {
+  Future<void> _fetchGames(GameSource source, Emitter<GamesState> emit) async {
     final result = await getAllGamesUseCase(source);
-
     result.fold(
       (error) {
         emit(GamesErrorState(error.toString()));
       },
       (games) {
-        // Update the games map with new data for this source
-        final updatedMap = Map<GameSource, List<Game>>.from(currentData.gamesMap);
-        updatedMap[source] = games;
-        
-        emit(GamesDataState(updatedMap, source));
+        _gamesCache[source] = games;
+        emit(GamesDataState(_gamesCache));
       },
     );
   }

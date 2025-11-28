@@ -407,9 +407,9 @@ class _GameTabContentState extends State<_GameTabContent> with AutomaticKeepAliv
 
           // Handle data state
           if (state is GamesDataState) {
-            final games = state.getGames(widget.source);
+            final games = state.games[widget.source];
             
-            if (!state.hasData(widget.source)) {
+            if (games == null) {
               // Data not loaded yet for this source
               return const Center(child: CircularProgressIndicator());
             }
