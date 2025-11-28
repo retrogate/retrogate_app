@@ -30,7 +30,10 @@ namespace RetroGate.SDK.Game.Infra.Repository
             return getAll.Match(
                 Right: games =>
                 {
-                    game.Id = ShortcutRepository.GenerateAppID(game.ExecutablePath, game.Name).ToString();
+                    if(game.Id == null || game.Id == "")
+                    {
+                        game.Id = ShortcutRepository.GenerateAppID(game.ExecutablePath, game.Name).ToString();
+                    }
                     games.Add(game);
                     SaveToFile(games);
                     return Prelude.Right<ErrorBase, GameModel>(game);
