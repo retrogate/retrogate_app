@@ -13,6 +13,7 @@ enum GameContextMenuAction {
   play,
   addToFavorites,
   uninstall,
+  delete,
 }
 
 class _MenuOption {
@@ -141,11 +142,11 @@ class _GameContextMenuState extends State<GameContextMenu> {
           label: 'Play',
           action: GameContextMenuAction.play,
         ),
-        _MenuOption(
-          icon: Icons.favorite_border,
-          label: 'Add to Favorites',
-          action: GameContextMenuAction.addToFavorites,
-        ),
+        // _MenuOption(
+        //   icon: Icons.favorite_border,
+        //   label: 'Add to Favorites',
+        //   action: GameContextMenuAction.addToFavorites,
+        // ),
         _MenuOption(
           icon: Icons.delete_outline,
           label: 'Uninstall',
@@ -162,16 +163,16 @@ class _GameContextMenuState extends State<GameContextMenu> {
           action: GameContextMenuAction.cancelInstallation,
           isDestructive: true,
         ),
-        _MenuOption(
-          icon: Icons.edit,
-          label: 'Edit',
-          action: GameContextMenuAction.edit,
-        ),
-        _MenuOption(
-          icon: Icons.visibility_off,
-          label: 'Hide',
-          action: GameContextMenuAction.hide,
-        ),
+        // _MenuOption(
+        //   icon: Icons.edit,
+        //   label: 'Edit',
+        //   action: GameContextMenuAction.edit,
+        // ),
+        // _MenuOption(
+        //   icon: Icons.visibility_off,
+        //   label: 'Hide',
+        //   action: GameContextMenuAction.hide,
+        // ),
       ];
     } else {
       // Jogo disponível para instalar
@@ -182,15 +183,21 @@ class _GameContextMenuState extends State<GameContextMenu> {
           action: GameContextMenuAction.install,
         ),
         _MenuOption(
-          icon: Icons.edit,
-          label: 'Edit',
-          action: GameContextMenuAction.edit,
+          icon: Icons.remove_circle_outline,
+          label: 'Delete',
+          action: GameContextMenuAction.delete,
+          isDestructive: true,
         ),
-        _MenuOption(
-          icon: Icons.visibility_off,
-          label: 'Hide',
-          action: GameContextMenuAction.hide,
-        ),
+        // _MenuOption(
+        //   icon: Icons.edit,
+        //   label: 'Edit',
+        //   action: GameContextMenuAction.edit,
+        // ),
+        // _MenuOption(
+        //   icon: Icons.visibility_off,
+        //   label: 'Hide',
+        //   action: GameContextMenuAction.hide,
+        // ),
       ];
     }
   }
