@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="craftersmine.SteamGridDB.Net" Version="1.1.7" />
     <PackageReference Include="LanguageExt.Core" Version="4.4.9" />
+    <PackageReference Include="SharpCompress" Version="0.38.0" />
   </ItemGroup>
 
 </Project>

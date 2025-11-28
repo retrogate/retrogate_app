@@ -9,7 +9,8 @@ using RetroGate.SDK.Installer.Domain.Repository;
 using RetroGate.SDK.Shortcut.Domain.Models;
 using RetroGate.SDK.Shortcut.Domain.Usecases;
 using System.Collections.Concurrent;
-using System.IO.Compression;
+using SharpCompress.Archives;
+using SharpCompress.Common;
 
 namespace RetroGate.SDK.Installer.Infra.Repository
 {
@@ -363,7 +364,7 @@ namespace RetroGate.SDK.Installer.Infra.Repository
 
         private async Task<string> ExtractGame(
             Game.Domain.Models.GameModel game,
-            string zipPath,
+            string archivePath,
             CancellationToken cancellationToken)
         {
             var extractPath = Path.Combine(_installBasePath, game.Id);
@@ -382,26 +383,19 @@ namespace RetroGate.SDK.Installer.Infra.Repository
 
             await Task.Run(() =>
             {
-                using var archive = ZipFile.OpenRead(zipPath);
-                var totalEntries = archive.Entries.Count;
+                using var archive = ArchiveFactory.Open(archivePath);
+                var totalEntries = archive.Entries.Count(e => !e.IsDirectory);
                 var extractedEntries = 0;
 
-                foreach (var entry in archive.Entries)
+                foreach (var entry in archive.Entries.Where(e => !e.IsDirectory))
                 {
                     cancellationToken.ThrowIfCancellationRequested();
 
-                    var destinationPath = Path.Combine(extractPath, entry.FullName);
-
-                    // Cria diretório se necessário
-                    if (string.IsNullOrEmpty(entry.Name))
+                    entry.WriteToDirectory(extractPath, new ExtractionOptions
                     {
-                        Directory.CreateDirectory(destinationPath);
-                    }
-                    else
-                    {
-                        Directory.CreateDirectory(Path.GetDirectoryName(destinationPath)!);
-                        entry.ExtractToFile(destinationPath, true);
-                    }
+                        ExtractFullPath = true,
+                        Overwrite = true
+                    });
 
                     // Incrementa o contador após extrair cada arquivo
                     extractedEntries++;
@@ -454,7 +448,7 @@ namespace RetroGate.SDK.Installer.Infra.Repository
                 AppName = game.Name,
                 Exe = $"\"{exePath}\"",
                 StartDir = $"\"{Path.GetDirectoryName(exePath)}\"",
-                Icon = exePath,
+                Icon = $"\"{exePath}\"",
                 LaunchOptions = "",
                 IsHidden = false,
                 AllowDesktopConfig = true,
