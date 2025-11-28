@@ -28,6 +28,7 @@ namespace RetroGate.SDK.Game.Infra.Repository
                 game.Match(
                     Right: async g =>
                     {
+                        g.Id = folderName;
                         games.Add(g);
                         var create = await Create(g);
                     },
