@@ -6,6 +6,8 @@ enum InstallerProgressState {
   paused,
   completed,
   failed,
+  cancelled,
+  uninstalled,
 }
 
 class InstallerProgress {
@@ -39,6 +41,10 @@ class InstallerProgress {
           return InstallerProgressState.completed;
         case 6:
           return InstallerProgressState.failed;
+        case 7:
+          return InstallerProgressState.cancelled;
+        case 8:
+          return InstallerProgressState.uninstalled;
         default:
           return InstallerProgressState.idle;
       }
@@ -68,6 +74,10 @@ class InstallerProgress {
         return 'Completed';
       case InstallerProgressState.failed:
         return 'Failed';
+      case InstallerProgressState.cancelled:
+        return 'Cancelled';
+      case InstallerProgressState.uninstalled:
+        return 'Uninstalled';
     }
   }
 

@@ -21,6 +21,8 @@ class InstallerProgressState extends $pb.ProtobufEnum {
   static const InstallerProgressState INSTALLER_PROGRESS_STATE_PAUSED = InstallerProgressState._(4, _omitEnumNames ? '' : 'INSTALLER_PROGRESS_STATE_PAUSED');
   static const InstallerProgressState INSTALLER_PROGRESS_STATE_COMPLETED = InstallerProgressState._(5, _omitEnumNames ? '' : 'INSTALLER_PROGRESS_STATE_COMPLETED');
   static const InstallerProgressState INSTALLER_PROGRESS_STATE_FAILED = InstallerProgressState._(6, _omitEnumNames ? '' : 'INSTALLER_PROGRESS_STATE_FAILED');
+  static const InstallerProgressState INSTALLER_PROGRESS_STATE_CANCELLED = InstallerProgressState._(7, _omitEnumNames ? '' : 'INSTALLER_PROGRESS_STATE_CANCELLED');
+  static const InstallerProgressState INSTALLER_PROGRESS_STATE_UNINSTALLED = InstallerProgressState._(8, _omitEnumNames ? '' : 'INSTALLER_PROGRESS_STATE_UNINSTALLED');
 
   static const $core.List<InstallerProgressState> values = <InstallerProgressState> [
     INSTALLER_PROGRESS_STATE_IDLE,
@@ -30,6 +32,8 @@ class InstallerProgressState extends $pb.ProtobufEnum {
     INSTALLER_PROGRESS_STATE_PAUSED,
     INSTALLER_PROGRESS_STATE_COMPLETED,
     INSTALLER_PROGRESS_STATE_FAILED,
+    INSTALLER_PROGRESS_STATE_CANCELLED,
+    INSTALLER_PROGRESS_STATE_UNINSTALLED,
   ];
 
   static final $core.Map<$core.int, InstallerProgressState> _byValue = $pb.ProtobufEnum.initByValue(values);

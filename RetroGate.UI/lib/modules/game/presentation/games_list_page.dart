@@ -4,6 +4,7 @@ import 'package:flutter_modular/flutter_modular.dart';
 import '../../../core/widgets/gamepad_focusable.dart';
 import '../../../core/widgets/gamepad_navigation_scope.dart';
 import '../../../core/widgets/app_drawer.dart';
+import '../../installer/domain/models/installer_progress.dart';
 import '../../installer/presentation/bloc/installer_bloc.dart';
 import '../../installer/presentation/bloc/installer_event.dart';
 import '../../installer/presentation/bloc/installer_state.dart';
@@ -311,6 +312,7 @@ class _GameTabContent extends StatefulWidget {
 
 class _GameTabContentState extends State<_GameTabContent> with AutomaticKeepAliveClientMixin {
   bool _isContextMenuOpen = false;
+  final Map<String, InstallerProgressState> _lastKnownStates = {};
 
   @override
   bool get wantKeepAlive => true;
@@ -324,44 +326,105 @@ class _GameTabContentState extends State<_GameTabContent> with AutomaticKeepAliv
     });
   }
 
+  void _handleInstallerStateChange(BuildContext context, InstallerState state) {
+    if (state is InstallerDataState) {
+      bool shouldRefresh = false;
+      
+      // Check each game progress
+      for (final progress in state.progressMap.values) {
+        final gameId = progress.gameId;
+        final currentState = progress.state;
+        final lastState = _lastKnownStates[gameId];
+        
+        // Only refresh if state changed AND it's a final state
+        if (lastState != currentState) {
+          _lastKnownStates[gameId] = currentState;
+          
+          // Only refresh on state transitions that affect game availability
+          if (_shouldRefreshOnStateChange(lastState, currentState)) {
+            shouldRefresh = true;
+            break;
+          }
+        }
+      }
+      
+      if (shouldRefresh) {
+        BlocProvider.of<GamesBloc>(context).add(RefreshGamesEvent(widget.source));
+      }
+    }
+  }
+  
+  bool _shouldRefreshOnStateChange(InstallerProgressState? oldState, InstallerProgressState newState) {
+    // Refresh when installation completes (game becomes installed)
+    if (newState == InstallerProgressState.completed) {
+      return true;
+    }
+    
+    // Refresh when game is uninstalled (game becomes available again)
+    if (newState == InstallerProgressState.uninstalled) {
+      return true;
+    }
+    
+    // Refresh when installation is cancelled (game returns to available)
+    if (newState == InstallerProgressState.cancelled && 
+        oldState != null && 
+        oldState != InstallerProgressState.idle) {
+      return true;
+    }
+    
+    // Refresh when installation fails (game returns to available)
+    if (newState == InstallerProgressState.failed &&
+        oldState != null &&
+        oldState != InstallerProgressState.idle) {
+      return true;
+    }
+    
+    // Don't refresh for intermediate states (downloading, extracting, etc)
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
     
-    return BlocBuilder<GamesBloc, GamesState>(
-      builder: (context, state) {
-        // Handle loading state
-        if (state is GamesLoadingState) {
-          // Only show loading if it's for this tab's source
-          if (state.source == null || state.source == widget.source) {
-            return const Center(child: CircularProgressIndicator());
+    return BlocListener<InstallerBloc, InstallerState>(
+      bloc: Modular.get<InstallerBloc>(),
+      listener: _handleInstallerStateChange,
+      child: BlocBuilder<GamesBloc, GamesState>(
+        builder: (context, state) {
+          // Handle loading state
+          if (state is GamesLoadingState) {
+            // Only show loading if it's for this tab's source
+            if (state.source == null || state.source == widget.source) {
+              return const Center(child: CircularProgressIndicator());
+            }
           }
-        }
 
-        // Handle error state
-        if (state is GamesErrorState) {
-          return _buildErrorView(context, state.message);
-        }
-
-        // Handle data state
-        if (state is GamesDataState) {
-          final games = state.getGames(widget.source);
-          
-          if (!state.hasData(widget.source)) {
-            // Data not loaded yet for this source
-            return const Center(child: CircularProgressIndicator());
+          // Handle error state
+          if (state is GamesErrorState) {
+            return _buildErrorView(context, state.message);
           }
-          
-          if (games.isEmpty) {
-            return _buildEmptyView();
-          }
-          
-          return _buildGamesList(games);
-        }
 
-        // Initial state - show nothing or loading
-        return const SizedBox.shrink();
-      },
+          // Handle data state
+          if (state is GamesDataState) {
+            final games = state.getGames(widget.source);
+            
+            if (!state.hasData(widget.source)) {
+              // Data not loaded yet for this source
+              return const Center(child: CircularProgressIndicator());
+            }
+            
+            if (games.isEmpty) {
+              return _buildEmptyView();
+            }
+            
+            return _buildGamesList(games);
+          }
+
+          // Initial state - show nothing or loading
+          return const SizedBox.shrink();
+        },
+      ),
     );
   }
 
