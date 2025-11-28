@@ -8,7 +8,6 @@ class GameCard extends StatefulWidget {
   final int index;
   final VoidCallback? onTap;
   final InstallerProgress? installProgress;
-  final bool isPending;
 
   const GameCard({
     super.key,
@@ -16,7 +15,6 @@ class GameCard extends StatefulWidget {
     required this.index,
     this.onTap,
     this.installProgress,
-    this.isPending = false,
   });
 
   @override
@@ -124,7 +122,7 @@ class _GameCardState extends State<GameCard> {
                   if (widget.installProgress != null && widget.installProgress!.isInProgress)
                     _buildProgressOverlay(),
                   // Pending overlay
-                  if (widget.isPending)
+                  if (widget.game.isPending)
                     _buildPendingOverlay(),
                   // Installation status badge (subtle, always visible)
                   Positioned(
@@ -247,7 +245,7 @@ class _GameCardState extends State<GameCard> {
 
   Widget _buildCenterIcon() {
     // If pending, show clock icon
-    if (widget.isPending) {
+    if (widget.game.isPending) {
       return const Icon(
         Icons.schedule,
         color: Colors.orange,
