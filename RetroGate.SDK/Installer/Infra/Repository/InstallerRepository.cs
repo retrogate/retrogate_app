@@ -24,7 +24,17 @@ namespace RetroGate.SDK.Installer.Infra.Repository
         private readonly HttpClient _httpClient;
         private readonly string _installBasePath;
         private readonly ConcurrentDictionary<string, CancellationTokenSource> _activeTasks;
+        private readonly Queue<PendingInstallation> _pendingInstallations;
+        private readonly SemaphoreSlim _installationSemaphore;
         private readonly ConfigModel _config;
+
+        private class PendingInstallation
+        {
+            public string GameId { get; set; } = string.Empty;
+            public bool Replace { get; set; }
+            public bool RestartSteam { get; set; }
+            public TaskCompletionSource<Either<ErrorBase, string>> CompletionSource { get; set; } = new();
+        }
 
         public event EventHandler<InstallerEventModel>? OnInstallerEvent;
 
@@ -47,6 +57,8 @@ namespace RetroGate.SDK.Installer.Infra.Repository
                 "RetroGate",
                 "Games");
             _activeTasks = new ConcurrentDictionary<string, CancellationTokenSource>();
+            _pendingInstallations = new Queue<PendingInstallation>();
+            _installationSemaphore = new SemaphoreSlim(1, 1);
             _config = config;
 
             // Garante que o diretório base existe
@@ -54,6 +66,63 @@ namespace RetroGate.SDK.Installer.Infra.Repository
         }
 
         public async Task<Either<ErrorBase, string>> Install(string gameId, bool replace = false, bool restartSteam = false)
+        {
+            // Verifica se já existe uma instalação ativa
+            if (_activeTasks.ContainsKey(gameId))
+            {
+                Console.WriteLine($"[Installer] Instalação do jogo {gameId} já está em andamento");
+                return new ErrorAlreadyExists();
+            }
+
+            // Verifica se já existe uma instalação na fila para este jogo
+            lock (_pendingInstallations)
+            {
+                if (_pendingInstallations.Any(p => p.GameId == gameId))
+                {
+                    Console.WriteLine($"[Installer] Instalação do jogo {gameId} já está na fila");
+                    return new ErrorAlreadyExists();
+                }
+            }
+
+            // Tenta adquirir o semáforo (só permite 1 instalação por vez)
+            if (!await _installationSemaphore.WaitAsync(0))
+            {
+                // Já existe uma instalação em andamento, adiciona à fila
+                var pending = new PendingInstallation
+                {
+                    GameId = gameId,
+                    Replace = replace,
+                    RestartSteam = restartSteam
+                };
+
+                lock (_pendingInstallations)
+                {
+                    _pendingInstallations.Enqueue(pending);
+                }
+
+                Console.WriteLine($"[Installer] Instalação do jogo {gameId} adicionada à fila (posição: {_pendingInstallations.Count})");
+                ReportProgress(gameId, InstallerProgressState.Pending, 0, 0);
+
+                // Aguarda a conclusão
+                return await pending.CompletionSource.Task;
+            }
+
+            try
+            {
+                // Executa a instalação
+                return await ExecuteInstallation(gameId, replace, restartSteam);
+            }
+            finally
+            {
+                // Libera o semáforo
+                _installationSemaphore.Release();
+                
+                // Processa próxima instalação da fila
+                await ProcessNextPendingInstallation();
+            }
+        }
+
+        private async Task<Either<ErrorBase, string>> ExecuteInstallation(string gameId, bool replace, bool restartSteam)
         {
             try
             {
@@ -191,7 +260,7 @@ namespace RetroGate.SDK.Installer.Infra.Repository
             }
         }
 
-        public Task<Either<ErrorBase, Unit>> Cancel(string id)
+        public async Task<Either<ErrorBase, Unit>> Cancel(string id)
         {
             try
             {
@@ -200,18 +269,20 @@ namespace RetroGate.SDK.Installer.Infra.Repository
                     Console.WriteLine($"[Installer] Cancelando instalação: {id}");
                     cts.Cancel();
                     ReportProgress(id, InstallerProgressState.Cancelled, 0, 0);
-                    return Task.FromResult<Either<ErrorBase, Unit>>(Unit.Default);
+                    
+                    // Processa próxima instalação da fila após cancelamento
+                    await ProcessNextPendingInstallation();
+                    
+                    return Unit.Default;
                 }
 
                 Console.WriteLine($"[Installer] Nenhuma instalação ativa encontrada para: {id}");
-                return Task.FromResult<Either<ErrorBase, Unit>>(
-                    new ErrorNotFound { Message = "Nenhuma instalação ativa encontrada" });
+                return new ErrorNotFound { Message = "Nenhuma instalação ativa encontrada" };
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"[Installer] Erro ao cancelar: {ex.Message}");
-                return Task.FromResult<Either<ErrorBase, Unit>>(
-                    new ErrorBase { Message = $"Erro ao cancelar instalação: {ex.Message}" });
+                return new ErrorBase { Message = $"Erro ao cancelar instalação: {ex.Message}" };
             }
         }
 
@@ -525,6 +596,38 @@ namespace RetroGate.SDK.Installer.Infra.Repository
             ReportProgress(gameId, InstallerProgressState.Uninstalled, 100, 0);
 
             return Unit.Default;
+        }
+
+        private async Task ProcessNextPendingInstallation()
+        {
+            PendingInstallation? nextInstallation = null;
+
+            lock (_pendingInstallations)
+            {
+                if (_pendingInstallations.Count > 0)
+                {
+                    nextInstallation = _pendingInstallations.Dequeue();
+                    Console.WriteLine($"[Installer] Processando próxima instalação da fila: {nextInstallation.GameId} ({_pendingInstallations.Count} restantes)");
+                }
+            }
+
+            if (nextInstallation != null)
+            {
+                // Executa a instalação pendente em background
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        var result = await Install(nextInstallation.GameId, nextInstallation.Replace, nextInstallation.RestartSteam);
+                        nextInstallation.CompletionSource.SetResult(result);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"[Installer] Erro ao processar instalação pendente: {ex.Message}");
+                        nextInstallation.CompletionSource.SetResult(new ErrorBase { Message = ex.Message });
+                    }
+                });
+            }
         }
     }
 }
