@@ -17,6 +17,7 @@ class Game {
   final GameSource source;
   final String? settingsFile;
   bool isInstalled = false;
+  bool isPending = false;
 
   Game({
     required this.id,
@@ -30,6 +31,7 @@ class Game {
     required this.source,
     this.settingsFile,
     this.isInstalled = false,
+    this.isPending = false,
   });
 
   factory Game.fromProto(dynamic proto, GameSource source) {
